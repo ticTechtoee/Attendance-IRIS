@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+	<title>Face Recognition Attendance System</title>
+  <link href="{% static 'CSS/help.css' %}" rel="stylesheet" type="text/css">
+  <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+	<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+</head>
+<body>
+<div class="wrapper">
+  <div class="sidebar">
+    <a href="{% url 'teacher_panel' %}"><img src={% static 'Images/FRAS_Logo.png' %}></a>
+    <ul>
+		  <li><a href="{% url 'teacher_panel' %}"><i class="fas fa-home"></i>Home</a></li>
+			<li><a href="{% url 'teacher_search_record' %}"><i class="fas fa-search"></i>Search & Update</a></li>
+			<li><a href="{% url 'take_attendance' %}"><i class="fas fa-search"></i>Mark Attendance</a></li>
+			<li><a href="{% url 'searchAttendence' %}"><i class="fas fa-search"></i>Attendance Record</a></li>
+			<li><a href="{% url 'logout' %}"><i class="fas fa-sign-out"></i>Logout</a></li>
+			<li><a href="{% url 'teacher_faqs' %}"><i class="fas fa-question-circle"></i>Help</a></li>
+		</ul>
+  </div>
+  <div class="main_content">
+    <br/><h2 style="text-align: center;">FAQs about FRAS</h2>
+    <br/>
+    <h3>How to Register the Student in System?</h3>
+    <p >To register the student must follow the below steps</p>
+    <ul>
+        <li>Click on the Student Register option</li>
+        <li>Take the picture of the student</li>
+        <li>Enter the student details</li>
+        <li>Click on Save button</li>
+        <li>Student will register successfully</li>
+    </ul>
+    <p></p>
+    <hr/>
+    <p></p>
+    <h3>How to Search the Student Record?</h3>
+    <p>To search the student record, go to the Search & update option. Here you can search the student record by their Department, Program, and Semmeter.</p>
+    <p></p>
+    <hr/>
+    <p></p>
+    <h3>How to mark the Student attendance?</h3>
+    <p>Admin or Teacher must login in their dashboard and go to the Mark Attendance option. The student will stand in the front of camera and system will match the student face with database and mark their attendance.</p>
+    <p></p>
+    <hr/>
+    <p></p>
+    <h3>How will student mark their attendance?</h3>
+    <p>Student will stand in the front of camera. The system will detect the student face and mark the attendance of the student.</p>
+</div>
+</div>
+
+</body>
+</html>

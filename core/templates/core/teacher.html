@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+<head>
+<title>Teacher Registration Form</title>
+<link href="{% static 'CSS/teacher_reg.css' %}" rel="stylesheet" type="text/css">
+<link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <a href="{% url 'index' %}"><img src={% static 'Images/FRAS_Logo.png' %}></a>
+            <ul>
+                <li><a href="{% url 'teacher_panel' %}"><i class="fas fa-home"></i>Home</a></li>
+                <li><a href="{% url 'teacher' %}"><i class="fas fa-user"></i>Register Teaher</a></li>
+                <li><a href="{% url 'teacher_update' %}"><i class="fas fa-edit"></i>Update Record</a></li>
+                <li><a href="{% url 'login_form' %}"><i class="fas fa-sign-out"></i>Logout</a></li>
+                <li><a href="{% url 'admin_faqs' %}"><i class="fas fa-question-circle"></i>Help</a></li>
+            </ul> 
+        </div>
+  <!--  <img class="wave" src="Images/login_form_wave.png"> -->
+<div class="full_reg_form">
+    <div class="reg_form">
+<form method="POST">
+    {% csrf_token %}
+   <img src={% static 'Images/student-registration.png' %}>
+<table style="width: 100%;">
+<caption>Teacher Registration</caption>
+<!-- <tr>
+    <th>Teacher ID</th> 
+    <td><input type="text" class="input" placeholder="Enter Teacher ID" required/></td>
+    </tr>
+<tr>-->
+<th>Teacher Name</th>
+<td><input type="text" class="input" name="teacher_name" maxlength="30" title="Enter Name" placeholder="Teacher Full Name" required/></td>
+</tr>
+<tr>
+<th>Email</th>
+<td><input type="email" class="input" placeholder="Enter Email ID" name="teacher_email" required/></td>
+</tr>
+<tr>
+    <th>Password</th>
+    <td><input type="password" class="input" placeholder="Enter Password" name="teacher_password" required/></td>
+    </tr>
+    
+<tr>
+<td colspan="2">
+<input class="reg_btn" type="submit" value="Save"/>
+</td>
+</tr>
+</table>
+{% if messages %}
+{% for message in messages %}
+{{message}}
+{% endfor %}
+{% endif %}
+</form>
+</div>
+
+</div>
+
+  
+</body>
+</html>

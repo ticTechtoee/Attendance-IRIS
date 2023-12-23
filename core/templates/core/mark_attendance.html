@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+<head>
+<title>Student Registration Form</title>
+<link href="{% static 'CSS/mark_attendance.css' %}" rel="stylesheet" type="text/css">
+<link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+<script>
+
+</script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="sidebar">
+      <a href="{% url 'index' %}"><img src={% static 'Images/FRAS_Logo.png' %}></a>
+      <ul>
+          <li><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>
+          <li><a href="{% url 'student' %}"><i class="fas fa-user"></i>Register Student</a></li>
+          <li><a href="{% url 'update_record' %}"><i class="fas fa-edit"></i>Update Record</a></li>
+          <li><a href="{% url 'mark_attendance' %}"><i class="fas fa-clock"></i>Attendance</a></li>
+          <li><a href="{% url 'search_record' %}"><i class="fas fa-search"></i>Search Record</a></li>
+          <li><a href="{% url 'teacher' %}"><i class="fas fa-user"></i>Register Teacher</a></li>
+          <li><a href="{% url 'login_form' %}"><i class="fas fa-sign-out"></i>Logout</a></li>
+          <li><a href="{% url 'teacher_faqs' %}"><i class="fas fa-question-circle"></i>Help</a></li>
+      </ul>
+    </div>
+    <div class="attendance_form">
+        <form action="{% url 'identify' %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+            <h3 class="title">Mark Attendance</h3>
+            <div id="container" style="height:550px; width:750px" >
+                <!-- <video autoplay="true" id="videoElement"> -->
+                
+                <!-- </video> -->
+                <div class="cam">
+                  <div class="video-wrap">
+                      <video id="video" autoplay></video>
+                
+                  </div>
+                  <div class="controller"><input type="submit" id="snap" class="student-pic-btn" value="Take Picture">
+                  </div>
+                
+                  <canvas id="canvas" width="300px" height="200px"></canvas>
+                  <input type="hidden" id="dum" name="image_data" value="">
+                </div>
+         <!--   <canvas id="mycanvas" width="600" height="300" style="border: 2px solid #d9d9d9; margin-top: 20px;"></canvas> 
+    <textarea id="attendance_area" rows="4" cols="80"></textarea> -->
+</form>
+
+</div>
+  </div>
+<script>
+//     var video = document.querySelector("#videoElement");
+// if (navigator.mediaDevices.getUserMedia) {
+//   navigator.mediaDevices.getUserMedia({ video: true })
+//     .then(function (stream) {
+//       video.srcObject = stream;
+//     })
+//     .catch(function (error) {
+//       console.log("Something went wrong!");
+//     });
+// }
+
+
+
+'use strict';
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap');
+        const errorMsgElement = document.getElementById('span#ErrorMsg');
+        const constraints = {
+            audio: true,
+            video: {
+                width: 750, height: 550
+            }
+        };
+        async function init() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                handleSuccess(stream);
+            }
+            catch (e) {
+            }
+            errorMsgElement.innerHTML = `navigator.getUserMedia.error:${e.toString()}`;
+        }
+
+        function handleSuccess(stream) {
+            window.stream = stream;
+            video.srcObject = stream;
+        }
+        init();
+
+        var context = canvas.getContext('2d');
+        snap.addEventListener("click", function () {
+            context.drawImage(video, 0, 0, 300, 200);
+            // const img_from_canvas = document.getElementById("img_from_canvas");
+            // img_from_canvas.src = canvas.toDataURL();
+            // .getImageData(0, 0, 300, 200)
+            var data_pixel = canvas.getContext('2d').getImageData(0, 0, 300, 200);
+            var Pic = document.getElementById("canvas").toDataURL("image/jpg");
+            document.getElementById("dum").value = Pic;
+
+        });
+
+</script>
+</body>
+</html>

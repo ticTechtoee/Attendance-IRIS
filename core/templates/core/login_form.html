@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login Form</title>
+    <link href="{% static 'CSS/style.css' %}" rel="stylesheet" type="text/css">
+    <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+</head>
+<body>
+  <center>
+    <h2>
+  {% for message in messages %}
+	{% if message.tags == 'error' %}
+		<div class="alert alert-danger">
+			{{ message }}
+		</div>
+	{% else %}
+		<div class="alert alert-success">
+			{{ message }}
+		</div>
+	{% endif %}
+{% endfor %}
+</h2>
+</center>
+    <img class="wave" src={% static 'Images/login_form_wave.png' %}>
+    <div class="container">
+      
+        <div class="img">
+            <img src={% static 'Images/login_side_image.png' %}>
+          </div>
+      <div class="login-box-content">
+        <form action="" method="post">
+          {% csrf_token %}
+          <img src={% static 'Images/login_profile_icon.svg' %}>
+          <h3 class="title">LOGIN HERE</h3>
+          <div class="input-div one">
+            <div class="i">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="div">
+                <input type="text" placeholder="Enter Username" name="username" class="input" required>
+            </div>
+          </div>
+          <div class="input-div pass">
+            <div class="i">
+              <i class="fas fa-lock"></i>
+            </div>
+            <div class="div">
+                <input type="password" placeholder="Enter Password" name="password" class="input" required>
+            </div>
+          </div>
+          <div class="text-center">
+            <p></p><p></p><p></p>
+            <a href="{% url 'reset_password' %}"
+            style="border: none; background-color: transparent; color: orange; float: right;" class="text-center" class="text-muted">
+                I Forgot my Password
+            </a>
+            <p></p>
+            <br/>
+       </div>
+          <div style="float: right;">
+
+            <label class="rad-label" style="float: left;">
+              <input type="radio" class="rad-input" name="radTech" value="0">
+              <div class="rad-design"></div>
+              <div class="rad-text">Teacher</div>
+            </label>
+          
+            <label class="rad-label" style="float: right;">
+              <input type="radio" class="rad-input" name="radAdmin" value="1">
+              <div class="rad-design"></div>
+              <div class="rad-text">Admin</div>
+            </label>
+          </div>
+
+
+         
+
+          <input type="submit" class="login-btn" value="Login" name="btnLogin">
+          <br/>
+          <p style="font-style: italic;">* Teacher must enter their email as a username.</p>
+        </form>
+      </div>
+    </div>
+
+</body>
+</html>

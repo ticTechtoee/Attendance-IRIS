@@ -1,0 +1,112 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    text-decoration: none;
+  }
+  
+  body {
+      font-family: "Poppins", sans-serif;
+      overflow: hidden;
+      background-color: rgba(246,249,250,.95);
+  }
+
+  .wrapper .sidebar{
+      width: 200px;
+      height: 100%;
+      background-image: linear-gradient(to right, #32d99f, #32be8c, #32be8e);
+      padding: 30px 0px;
+      position: fixed;
+  }
+  
+  .wrapper .sidebar img{
+      text-align: center;
+      margin-bottom: 30px;
+      margin-left: 15px;
+      width: 130px;
+  }
+  
+  .wrapper .sidebar ul li{
+      padding: 20px;
+      border-bottom: 1px solid #bdb8d7;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      border-top: 1px solid rgba(255,255,255,0.05);
+  }    
+  
+  .wrapper .sidebar ul li a{
+      color: #fff;
+      display: block;
+  }
+  
+  .wrapper .sidebar ul li a .fas{
+      width: 25px;
+  }
+  
+  .wrapper .sidebar ul li:hover{
+      background-color: #32d99f;
+  }
+      
+  .wrapper .sidebar ul li:hover a{
+      color: rgb(255, 255, 255);
+  }
+   
+  .wrapper .main_content{
+      background-color: rgba(256, 256, 256, .70);
+      border-radius: 10px;
+      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+      left: 55%;
+      top: 50%;
+      padding: 10px;
+      transform: translate(-50%, -50%);
+      position: absolute;
+      display: flex;
+      width: 70%;
+      height: auto;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+  
+.column {
+      float: left;
+      width: 32.90%;
+      padding: 10px;
+      margin: 2px;
+}
+
+.row {
+      margin: 5px;
+      display: inline;
+}
+
+@media screen and (max-width: 600px) {
+  .column {
+      width: 100%;
+      display: block;
+      margin-bottom: 20px;
+  }
+}
+
+.card {
+  /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);*/
+    padding: 20px;
+    text-align: center;
+    background-color: #fff;
+    margin: 10px;
+}
+.card img{
+    width: 120px;
+    padding: 20px;
+    /*border-radius: 50%;
+    box-shadow: 0 4px 8px 0 rgba(256, 256, 256, 0.9);*/
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.card p{
+    font-weight: bold;
+    color: #fff;
+    margin-top: 15px;
+    font-size: 18px;
+}

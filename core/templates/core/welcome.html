@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+<head>
+<title>Welcome to Face Attendance System</title>
+<link href="{% static 'CSS/welcome.css' %}" rel="stylesheet" type="text/css">
+<link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+</head>
+<body>
+    <img class="wave" src={% static 'Images/login_form_wave_welcome.png' %}>
+    <div id="container">
+        <main>
+        <div class="main-content">
+        <h3 class="headline">Face Recognition Attendance System (FRAS)</h3>
+        <p class="description">
+            FRAS uses facial recognition technology to identify and verify a student using the student's facial features and automatically mark attendance.
+        </p>
+        <a href="{% url 'login_form' %}"><button class="wel-button">
+        <i class="fas fa-sign-in"></i>Login Here
+        </button></a>
+        </div>
+        <div class="main-img">
+        <img class="wel-img" src={% static '/Images/welcome_icon.png' %} alt="welcome">
+        </div> 
+        </main>
+        </div>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html lang="en">
+ 
+<head>
+  <title>Search Record</title>
+  <link href="{% static 'CSS/search_record_style.css' %}" rel="stylesheet" type="text/css">
+  <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<style>
+  table, th, td {
+    display: relative;
+     border: 1px solid black;
+     padding-right: 10px;
+     padding-left: 10px;
+  }
+  table{
+    left: 40%;
+  }
+  td{
+    text-align: center;
+  }
+  table h2{
+    font-size: 20px;
+  }
+</style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="sidebar">
+      <a href="{% url 'index' %}"><img src={% static 'Images/FRAS_Logo.png' %}></a>
+      <ul>
+          <li><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>
+          <li><a href="{% url 'student' %}"><i class="fas fa-user"></i>Register Student</a></li>
+          <li><a href="{% url 'search_record' %}"><i class="fas fa-search"></i>Search & Update</a></li>
+          <li><a href="{% url 'teacher' %}"><i class="fas fa-user"></i>Register Teacher</a></li>
+          <li><a href="{% url 'login_form' %}"><i class="fas fa-sign-out"></i>Logout</a></li>
+          <li><a href="{% url 'admin_faqs' %}"><i class="fas fa-question-circle"></i>Help</a></li>
+        </ul> 
+    </div>
+    <div class="search">
+      
+      <div>
+        <section class="search_bar">
+          <div class="dropdown">
+            <form name="PostName" action="{% url 'search_record' %}" method="post">
+              {% csrf_token %}
+
+            <select name="department" onchange="PostName.submit()" class="dropdown-select">
+              <option value="" disabled selected>Department</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Life Science">Life Science</option>
+              <option value="BBA">BBA</option>
+              <option value="Math">Math</option>
+            </select>
+          </form>
+          </div>
+          <div class="dropdown dropdown">
+            <form name="prog" action="{% url 'search_record' %}" method="post" >
+              {% csrf_token %}
+
+            <select name="program"  onchange="prog.submit()" class="dropdown-select">
+              <option disabled selected>Program</option>
+              <option value="BSCS">BSCS</option>
+              <option value="BSIT">BSIT</option>
+              <option value="BSCS (AI)">BSCS (AI)</option>
+              <option value="BSSE">BSSE</option>
+              <option value="BS Zoology">BS Zoology</option>
+              <option value="BS Botany">BS Botany</option>
+              <option value="BS Biochemistry">BS Biochemistry</option>
+              <option value="BS Math">BS Math</option>
+              <option value="BS Microbiology">BS Microbiology</option>
+              <option value="BS HND">BS HND</option>
+              <option value="BBA 2 Years">BBA 2 Years</option>
+              <option value="BBA">BBA</option>
+
+            </select>
+          </form>
+          </div>
+          <div class="dropdown dropdown">
+            <form action="{% url 'search_record' %}" method="post" name="sem">
+              {% csrf_token %}
+
+            <select name="semester" onchange="sem.submit()" class="dropdown-select">
+              <option value="" disabled selected>Semester</option>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+          </form>
+          </div>
+        </section>
+      </div>
+      <form class="search_form" action="{% url 'search_record' %}" name="bar" method="post">
+        {% csrf_token %}
+
+        <input type="text" name="search" placeholder="Search.." name="search">
+        <button type="submit"><i class="fas fa-search"></i></button>
+      </form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+    <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+    <!-- new -->
+    <div class="full_reg_form">
+      <div class="reg_form">
+        {% csrf_token %}
+        <!-- <img src="Images/student-registration.png"> -->
+
+        <table style="width: 70%;margin-left: 15%;">
+          <tr>
+            <th>
+            <h2>No </h2>  
+            </th>
+            <th><h2>Student ID </h2></th>
+            <th><h2>Name </h2></th>
+            <th><h2>Department </h2></th>
+            <th><h2>Program</h2></th>
+            <th><h2>Semester </h2></th>
+            <th><h2>Profile Picture </h2></th>
+            <th><h2>Update Information </h2></th>
+            <!-- {% if not request.user.is_superuser %}
+
+            <th><h2>Take Images </h2></th>
+
+            {% endif %} -->
+          </tr>
+          {% for student in students %}
+          <tr>
+            <td>
+              {{forloop.counter}}
+            </td>
+            <td>
+              {{student.user.username}}
+            </td>
+            <td>
+              {{student.user.first_name}}
+            </td>
+            <td>
+              {{student.department}}
+            </td>
+            <td>
+              {{student.program}}
+            </td>
+            <td>
+              {{student.semester}}
+            </td>
+            <td>
+              <img src="{{student.profile_picture.url}}" height="100px" width="170px" alt="image is not available">
+
+            </td>
+            <td>
+              <a href="{% url 'updateStudentDetails' student.user.id %}" class="btn btn-warning">
+                Update Student Details
+              </a>
+            </td>
+            
+          </tr>
+          {% endfor %}
+        </table>
+
+      </div>
+
+    </div>
+<br>
+
+
+
+
+  </div>
+
+
+
+
+
+
+
+</body>
+<!-- <script>
+  function searchdepartment(x){
+    alert(x);
+  }
+  
+  function searchprogram(x){
+    alert(x);
+  }
+
+  function searchsemester(x){
+    alert(x);
+  }
+  
+</script> -->
+</html>
