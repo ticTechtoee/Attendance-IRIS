@@ -12,14 +12,14 @@
 <body>
 <div class="wrapper">
     <div class="sidebar">
-        <a href="{% url 'index' %}"><img src="{% static 'Images/FRAS_Logo.png' %}"></a>
+        <a href="{% url 'core:index' %}"><img src="{{Set_Logo.logo_of_project.url}}"></a>
         <ul>
-          <li><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>
-              <li><a href="{% url 'student' %}"><i class="fas fa-user"></i>Register Student</a></li>
-              <li><a href="{% url 'search_record' %}"><i class="fas fa-search"></i>Search & Update</a></li>
-              <li><a href="{% url 'teacher' %}"><i class="fas fa-user"></i>Register Teacher</a></li>
-              <li><a href="{% url 'login_form' %}"><i class="fas fa-sign-out"></i>Logout</a></li>
-              <li><a href="{% url 'admin_faqs' %}"><i class="fas fa-question-circle"></i>Help</a></li>
+          <li><a href="{% url 'core:index' %}"><i class="fas fa-home"></i>Home</a></li>
+              <li><a href="#"><i class="fas fa-user"></i>Register Student</a></li>
+              <li><a href="#"><i class="fas fa-search"></i>Search & Update</a></li>
+              <li><a href="#"><i class="fas fa-user"></i>Register Teacher</a></li>
+              <li><a href="#"><i class="fas fa-sign-out"></i>Logout</a></li>
+              <li><a href="#"><i class="fas fa-question-circle"></i>Help</a></li>
           </ul> 
     </div>
     <div class="main_content">
@@ -27,42 +27,42 @@
         <div class="row">
           <div class="column" style="background-color: #35495F;">
             <div class="card" style="background-color: #35495F;">
-              <a href="{% url 'index' %}"><img src ={% static '/Images/home_icon.png' %}/></a>
+              <a href="{% url 'core:index' %}"><img src ={% static '/Images/home_icon.png' %}/></a>
               <p>Home</p>
             </div>
           </div>
         
           <div class="column" style="background-color: #15A085;">
             <div class="card" style="background-color: #15A085;">
-              <a href="{% url 'student' %}"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
+              <a href="#"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
               <p>Register Student</p>
             </div>
           </div>
           
           <div class="column" style="background-color: #F39C13;">
             <div class="card" style="background-color: #F39C13;">
-              <a href="{% url 'search_record' %}"><img src ={% static '/Images/search_icon.png' %}/></a>
+              <a href="#"><img src ={% static '/Images/search_icon.png' %}/></a>
               <p>Search & Update Record</p>
             </div>
           </div>
 
           <div class="column" style="background-color: #2A80B9;">
             <div class="card" style="background-color: #2A80B9;">
-              <a href="{% url 'teacher' %}"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
+              <a href="#"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
               <p>Register Teacher</p>
             </div>
           </div>
         
           <div class="column" style="background-color: #E74C3D;">
             <div class="card" style="background-color: #E74C3D;">
-              <a href="{% url 'login_form' %}"><img src ={% static '/Images/logout_icon.png' %}/></a>
+              <a href="#"><img src ={% static '/Images/logout_icon.png' %}/></a>
               <p>Logout</p>
             </div>
           </div>
           
           <div class="column" style="background-color: #8E44AD;">
             <div class="card" style="background-color: #8E44AD;">
-              <a href="{% url 'admin_faqs' %}"><img src ={% static '/Images/help_icon.png' %}/></a>
+              <a href="#"><img src ={% static '/Images/help_icon.png' %}/></a>
               <p>Help</p>
             </div>
           </div>

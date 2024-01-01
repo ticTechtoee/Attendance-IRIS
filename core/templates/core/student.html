@@ -13,14 +13,14 @@
 <body>
     <div class="wrapper">
         <div class="sidebar">
-            <a href="{% url 'index' %}"><img src={% static 'Images/FRAS_Logo.png' %}></a>
+            <a href="{% url 'core:index' %}"><img src={% static 'Images/FRAS_Logo.png' %}></a>
             <ul>
-                <li><a href="{% url 'index' %}"><i class="fas fa-home"></i>Home</a></li>
-                <li><a href="{% url 'student' %}"><i class="fas fa-user"></i>Register Student</a></li>
-                <li><a href="{% url 'search_record' %}"><i class="fas fa-search"></i>Search & Update</a></li>
-                <li><a href="{% url 'teacher' %}"><i class="fas fa-user"></i>Register Teacher</a></li>
-                <li><a href="{% url 'login_form' %}"><i class="fas fa-sign-out"></i>Logout</a></li>
-                <li><a href="{% url 'admin_faqs' %}"><i class="fas fa-question-circle"></i>Help</a></li>
+                <li><a href="{% url 'core:index' %}"><i class="fas fa-home"></i>Home</a></li>
+                <li><a href="{% url 'core:ViewRegisterStudent' %}"><i class="fas fa-user"></i>Register Student</a></li>
+                <li><a href=""><i class="fas fa-search"></i>Search & Update</a></li>
+                <li><a href=""><i class="fas fa-user"></i>Register Teacher</a></li>
+                <li><a href=""><i class="fas fa-sign-out"></i>Logout</a></li>
+                <li><a href=""><i class="fas fa-question-circle"></i>Help</a></li>
             </ul> 
         </div>
         <div class="full_reg_form">
