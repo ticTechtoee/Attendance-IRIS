@@ -18,7 +18,7 @@ class AppUser(AbstractUser):
             self.program = None
             self.semester = None
 
-        super(WebUser, self).save(*args, **kwargs)
+        super(AppUser, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.email
