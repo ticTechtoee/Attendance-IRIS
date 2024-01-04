@@ -1,163 +1,68 @@
+<!-- HTML template -->
 <!DOCTYPE html>
-{% load static %}
-
-<html>
-
+<html lang="en">
 <head>
-    <title>Student Registration Form</title>
-    <link href="{% static 'CSS/student_reg.css' %}" rel="stylesheet" type="text/css">
-    <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
-    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Capture</title>
 </head>
-
 <body>
-    <div class="wrapper">
-        <div class="sidebar">
-            <a href="{% url 'core:index' %}"><img src={% static 'Images/FRAS_Logo.png' %}></a>
-            <ul>
-                <li><a href="{% url 'core:index' %}"><i class="fas fa-home"></i>Home</a></li>
-                <li><a href="{% url 'core:ViewRegisterStudent' %}"><i class="fas fa-user"></i>Register Student</a></li>
-                <li><a href=""><i class="fas fa-search"></i>Search & Update</a></li>
-                <li><a href=""><i class="fas fa-user"></i>Register Teacher</a></li>
-                <li><a href=""><i class="fas fa-sign-out"></i>Logout</a></li>
-                <li><a href=""><i class="fas fa-question-circle"></i>Help</a></li>
-            </ul> 
-        </div>
-        <div class="full_reg_form">
-            <div class="reg_form">
-                <form action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <table style="width: 100%;">
-                        <caption>Registration form</caption>
-                        <tr>
-                            <th>Student Name</th>
-                            <td><input type="text" class="input" name="fname" maxlength="30" title="Enter Name"
-                                    placeholder="Enter Student Name" required /></td>
-                        </tr>
-                        <tr>
-                            <th>Student Arid ID</th>
-                            <td><input type="text" class="input" name="student_id" placeholder="Enter Student ID"
-                                    required />
-                                <span style="color:red">{{useriderror}}</span>
-                            </td>
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <button id="captureButton">Capture</button>
+    <canvas id="canvas" width="640" height="480"></canvas>
 
-                        </tr>
-                        <tr>
-                            <th>Student Department</th>
-                            <td>
-                                <select name="department" id="department" class="input" class="form-control" placeholder="Department"
-                                    required>
-                                    <option value="" disabled selected>Department</option>
-                                    <option value="Computer Science">Computer Science</option>
-                                    <option value="Life Science">Life Science</option>
-                                    <option value="BBA">BBA</option>
-                                    <option value="Math">Math</option>
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Student Program</th>
-                            <td>
-                                <select name="program" id="program" class="input" class="form-control" placeholder="Student Program"
-                                    required>
-                                    <option value="" disabled selected>Student Program</option>
-                                    <option value="BSCS">BSCS</option>
-                                    <option value="BSIT">BSIT</option>
-                                    <option value="BSCS (AI)">BSCS (AI)</option>
-                                    <option value="BSSE">BSSE</option>
-                                    <option value="BS Zoology">BS Zoology</option>
-                                    <option value="BS Botany">BS Botany</option>
-                                    <option value="BS Biochemistry">BS Biochemistry</option>
-                                    <option value="BS Math">BS Math</option>
-                                    <option value="BS Microbiology">BS Microbiology</option>
-
-                                    <option value="BS HND">BS HND</option>
-                                    <option value="BBA 2 Years">BBA 2 Years</option>
-                                    <option value="BBA">BBA</option>
-
-
-                                </select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Student Semester</th>
-                            <td>
-                                <select name="semester" id="semester" class="input" class="form-control" placeholder="Semester"
-                                    required>
-                                    <option value="" disabled selected>Select Semester</option>
-                                    <option value=1>Semester 1</option>
-                                    <option value=2>Semester 2</option>
-                                    <option value=3>Semester 3</option>
-                                    <option value=4>Semester 4</option>
-                                    <option value=5>Semester 5</option>
-                                    <option value=6>Semester 6</option>
-                                    <option value=7>Semester 7</option>
-                                    <option value=8>Semester 8</option>
-                                </select>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td colspan="2">
-                                <input class="reg_btn" type="submit" />
-                                <input class="reg_btn" type="reset" value="Reset" />
-                            </td>
-                        </tr>
-                    </table>
-
-            </div>
-            <div class="cam">
-                <div class="video-wrap">
-                    <video id="video" autoplay></video>
-
-                </div>
-                <div class="controller"><input type="submit" id="snap" class="student-pic-btn" value="Take Picture">
-                </div>
-
-                <canvas id="canvas" width="300px" height="200px"></canvas>
-
-                <input type="hidden" id="dum" name="image_data" value="">
-            </div>
-            </form>
-        </div>
-    </div>
     <script>
         'use strict';
-        const video = document.getElementById('video');
+
+        const webcam = document.getElementById('webcam');
+        const captureButton = document.getElementById('captureButton');
         const canvas = document.getElementById('canvas');
-        const snap = document.getElementById('snap');
-        const errorMsgElement = document.getElementById('span#ErrorMsg');
-        const constraints = {
-            audio: true,
-            video: {
-                width: 300, height: 200
-            }
-        };
-        async function init() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-                handleSuccess(stream);
-            }
-            catch (e) {
-            }
-            errorMsgElement.innerHTML = `navigator.getUserMedia.error:${e.toString()}`;
-        }
+        const context = canvas.getContext('2d');
 
-        function handleSuccess(stream) {
-            window.stream = stream;
-            video.srcObject = stream;
-        }
-        init();
-        var context = canvas.getContext('2d');
-        snap.addEventListener("click", function () {
-            context.drawImage(video, 0, 0, 300, 200);
-            var data_pixel = canvas.getContext('2d').getImageData(0, 0, 300, 200);
-            var Pic = document.getElementById("canvas").toDataURL("image/jpg");
-            document.getElementById("dum").value = Pic;
+        // Access webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                webcam.srcObject = stream;
+            })
+            .catch((error) => {
+                console.error('Error accessing webcam:', error);
+            });
 
+        // Capture image and send to the server on button click
+        captureButton.addEventListener('click', () => {
+            context.drawImage(webcam, 0, 0, canvas.width, canvas.height);
+            const imageDataUrl = canvas.toDataURL('image/png');
 
+            // Send the captured image data to the server (Django) using an AJAX request
+            sendImageDataToServer(imageDataUrl);
         });
+
+        // Function to send image data to the server
+        function sendImageDataToServer(imageDataUrl) {
+            fetch('/capture_image/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCSRFToken('{% csrf_token %}'),  // Include CSRF token
+                },
+                body: `image_data=${encodeURIComponent(imageDataUrl)}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Image captured and saved:', data);
+                // Provide user feedback or update UI as needed
+            })
+            .catch(error => {
+                console.error('Error capturing and saving image:', error);
+                // Handle errors or provide user-friendly feedback
+            });
+        }
+
+        // Function to get the CSRF token
+        function getCSRFToken() {
+            const csrfCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+            return csrfCookie ? csrfCookie.split('=')[1] : null;
+        }
     </script>
 </body>
-
 </html>
