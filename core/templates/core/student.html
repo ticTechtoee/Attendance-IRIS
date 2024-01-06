@@ -1,68 +1,16 @@
-<!-- HTML template -->
+<!-- webcam_app/templates/webcam_app/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam Capture</title>
+    <title>Webcam Stream</title>
 </head>
 <body>
+    <h1>Webcam Stream</h1>
     <video id="webcam" width="640" height="480" autoplay></video>
     <button id="captureButton">Capture</button>
-    <canvas id="canvas" width="640" height="480"></canvas>
-
-    <script>
-        'use strict';
-
-        const webcam = document.getElementById('webcam');
-        const captureButton = document.getElementById('captureButton');
-        const canvas = document.getElementById('canvas');
-        const context = canvas.getContext('2d');
-
-        // Access webcam
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then((stream) => {
-                webcam.srcObject = stream;
-            })
-            .catch((error) => {
-                console.error('Error accessing webcam:', error);
-            });
-
-        // Capture image and send to the server on button click
-        captureButton.addEventListener('click', () => {
-            context.drawImage(webcam, 0, 0, canvas.width, canvas.height);
-            const imageDataUrl = canvas.toDataURL('image/png');
-
-            // Send the captured image data to the server (Django) using an AJAX request
-            sendImageDataToServer(imageDataUrl);
-        });
-
-        // Function to send image data to the server
-        function sendImageDataToServer(imageDataUrl) {
-            fetch('/capture_image/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCSRFToken('{% csrf_token %}'),  // Include CSRF token
-                },
-                body: `image_data=${encodeURIComponent(imageDataUrl)}`,
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Image captured and saved:', data);
-                // Provide user feedback or update UI as needed
-            })
-            .catch(error => {
-                console.error('Error capturing and saving image:', error);
-                // Handle errors or provide user-friendly feedback
-            });
-        }
-
-        // Function to get the CSRF token
-        function getCSRFToken() {
-            const csrfCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
-            return csrfCookie ? csrfCookie.split('=')[1] : null;
-        }
-    </script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{% static '/assets/js/webcam.js' %}"></script>
 </body>
 </html>

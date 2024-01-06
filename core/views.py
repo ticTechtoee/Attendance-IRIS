@@ -5,6 +5,10 @@ from django.shortcuts import render
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from .models import ApplicationName
+import os
+import logging  # Import the logging module for error logging
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 def SetProjectNameView(request):
     set_name =  ApplicationName.objects.latest('id')
@@ -28,29 +32,17 @@ def add_padding(data):
     if padding:
         data += '=' * (4 - padding)
     return data
-
+@csrf_exempt
 def capture_image(request):
-    if request.method == 'POST':
-        # Get the image data from the request
-        image_data = request.POST.get('image_data')
+    if request.method == 'POST' and 'image_data' in request.POST:
+        image_data = request.POST['image_data'].split(',')[1]
+        image_content = ContentFile(base64.b64decode(image_data), name='captured_image.png')
 
-        # Add padding to the Base64 data
-        padded_image_data = add_padding(image_data)
-
-        # Decode the Base64-encoded image data
-        try:
-            image_data_decoded = base64.b64decode(padded_image_data)
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': f'Error decoding image: {str(e)}'})
-
-        # Save the image to the media folder
-        image_path = 'captured_images/image.png'
-        image_full_path = default_storage.path(image_path)
-
-        with open(image_full_path, 'wb') as image_file:
-            image_file.write(image_data_decoded)
-
-        # Respond with success or additional data
-        return JsonResponse({'status': 'success', 'image_path': image_path})
-
-    return render(request, 'core/student.html')
+            # Save the image to the /captured_images/ folder in the media directory
+        image_path = 'captured_images/captured_image.png'
+        with open(os.path.join(settings.MEDIA_ROOT, image_path), 'wb') as img_file:
+            img_file.write(image_content.read())
+            return JsonResponse({'message': 'Image captured and saved successfully!'})
+    else:
+        return render(request, 'core/student.html')
+    
