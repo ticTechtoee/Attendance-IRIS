@@ -1,7 +1,7 @@
 // webcam_app/static/webcam_app/js/webcam.js
 document.addEventListener('DOMContentLoaded', function () {
-    const video = document.getElementById('webcam');
-    const captureButton = document.getElementById('captureButton');
+    const video = document.getElementById('video');
+    const captureButton = document.getElementById('snap');
 
     navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
