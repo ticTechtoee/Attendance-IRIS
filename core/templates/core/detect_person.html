@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+
+<head>
+    <title>Cature Image</title>
+    <link href="{% static 'CSS/student_reg.css' %}" rel="stylesheet" type="text/css">
+    <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <a href="#"><img src={% static 'Images/FRAS_Logo.png' %}></a>
+            <ul>
+                <li><a href="#"><i class="fas fa-home"></i>Home</a></li>
+                <li><a href="#"><i class="fas fa-user"></i>Register Student</a></li>
+                <li><a href="#"><i class="fas fa-search"></i>Search & Update</a></li>
+                <li><a href="#"><i class="fas fa-user"></i>Register Teacher</a></li>
+                <li><a href="#"><i class="fas fa-sign-out"></i>Logout</a></li>
+                <li><a href="#"><i class="fas fa-question-circle"></i>Help</a></li>
+            </ul>
+        </div>
+        <div class="full_reg_form">
+            <div class="reg_form">
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    </div>
+            <div class="cam">
+                <div class="video-wrap">
+                    <video id="video" width="640" height="480" autoplay></video>
+
+                </div>
+                <div class="controller"><input type="submit" id="snap" class="student-pic-btn" value="Take Picture">
+                </div>
+
+            </div>
+            </form>
+        </div>
+
+    </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="{% static '/assets/js/detect_image.js' %}"></script>
+</body>
+
+</html>

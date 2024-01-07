@@ -187,10 +187,11 @@ def TrainOnDataView(request):
 
 def recognize_faces(image_path):
     # Load the trained data
-    with open('trained_data.dat', 'rb') as file:
+    get_trained_data_path = os.path.join(settings.BASE_DIR, "trained_data")
+    print(get_trained_data_path)
+    with open(get_trained_data_path + '\\trained_data.dat', 'rb') as file:
         data = pickle.load(file)
-        known_face_encodings = data['encodings']
-        known_face_names = data['names']
+        known_persons_data = data  # Assume 'known_data' contains a list of dictionaries
 
     # Load the image
     unknown_image = face_recognition.load_image_file(image_path)
@@ -201,17 +202,54 @@ def recognize_faces(image_path):
 
     for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
         # Check if the face matches any known face
-        matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.5)
-
+        matches = face_recognition.compare_faces(
+            [person['encodings'] for person in known_persons_data],
+            face_encoding,
+            tolerance=0.5
+        )
 
         name = "Unknown"
+        person_id = None
 
         if True in matches:
             first_match_index = matches.index(True)
-            name = known_face_names[first_match_index]
+            name = known_persons_data[first_match_index]['name']
+            person_id = known_persons_data[first_match_index]['id']
 
-        print(f"Person: {name}, Location: {top},{right},{bottom},{left}")
+        print(f"Person: {name}, ID: {person_id}, Location: {top},{right},{bottom},{left}")
 
-if __name__ == "__main__":
-    image_path = input("Enter the path to the image for recognition: ")
-    recognize_faces(image_path)
+@csrf_exempt
+def DetectPersonView(request):
+    if request.method == 'POST' and 'image_data' in request.POST:
+            try:
+                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+                
+                capture_image_folder = "detect_image"
+                image_recognize_path = os.path.join(settings.BASE_DIR, capture_image_folder)
+                if not os.path.exists(image_recognize_path):
+                    os.makedirs(image_recognize_path)
+                
+                # Create the file name with the timestamp
+                file_name = f"_{timestamp}.png"
+
+                # Process the captured image data
+                image_data = request.POST['image_data'].split(',')[1]
+                image_content = ContentFile(base64.b64decode(image_data), name=file_name)        
+                
+                # Create the full image path
+                image_path = os.path.join(image_recognize_path, file_name)
+
+                # Save the image file to the specified path
+                print(image_path)
+                with open(os.path.join(settings.MEDIA_ROOT, image_path), 'wb') as img_file:
+                    img_file.write(image_content.read())
+
+                #recognize_faces(image_path)
+
+                print("Recognizing")
+            
+            except Exception as e:
+                print("Error:" + e)
+            
+    context = {}
+    return render(request, 'core/detect_person.html', context)
