@@ -3,10 +3,12 @@ from django.db import models
 from core.models import Department, Program, Semester, ApplicationType
 
 class AppUser(AbstractUser):
+    custom_unique_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.DO_NOTHING)
     program = models.ForeignKey(Program, null=True, blank=True, on_delete=models.DO_NOTHING)
     semester = models.ForeignKey(Semester, null=True, blank=True, on_delete=models.DO_NOTHING)
+    image_path = models.FilePathField(null=True, blank=True)
 
     # Additional field for storing the application type
     application_type = models.ForeignKey(ApplicationType, null=True, blank=True, on_delete=models.DO_NOTHING)

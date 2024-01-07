@@ -1,14 +1,19 @@
 import base64
 from django.core.files.storage import default_storage
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from .models import ApplicationName
+from .models import ApplicationName,ApplicationType
 import os
-import logging  # Import the logging module for error logging
+from .models import Department
+from AccountApp.models import AppUser
+from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+import os
+import face_recognition
+import pickle
 
 def SetProjectNameView(request):
     set_name =  ApplicationName.objects.latest('id')
@@ -22,9 +27,40 @@ def IndexPageView(request):
     context = {'Set_Logo': set_logo}
     return render(request, 'core/index.html', context)
 
-def RegisterStudentView(request):
-    context = {}
+def RegisterPersonView(request):
+    get_dept_name = Department.objects.all()
+    try:
+        # Assuming there's only one record in the ApplicationType model
+        get_application_type = ApplicationType.objects.get()
+    except ApplicationType.DoesNotExist:
+        # Handle the case where no record is found
+        get_application_type = None
+    if request.method == 'POST':
+        u_id = request.POST.get('Unique_ID')
+        user_name = request.POST.get('username')
+        first_name = request.POST.get('fname')
+        last_name = request.POST.get('lname')
+        email = request.POST.get('email')
+        deptt = request.POST.get('department')
+        
+        get_deptt = Department.objects.get(id = deptt)
+
+        AppUser(custom_unique_id=u_id, username=user_name, first_name = first_name, last_name = last_name, email= email, department=get_deptt).save()
+
+        if AppUser.save:
+            # Create a folder in the media directory using the unique ID, first name, and last name
+            folder_name = f"{u_id}_{first_name}_{last_name}"
+            media_folder_path = os.path.join("media", folder_name)
+
+            # Check if the folder already exists, and create it if not
+            if not os.path.exists(media_folder_path):
+                os.makedirs(media_folder_path)
+        return redirect('core:ViewCaptureImage')
+    
+    context = {'dept_names':get_dept_name, 'app_type':get_application_type}
     return render(request, "core/student.html", context)
+
+
 
 def add_padding(data):
     # Ensure that the Base64 data has proper padding
@@ -32,17 +68,115 @@ def add_padding(data):
     if padding:
         data += '=' * (4 - padding)
     return data
+
 @csrf_exempt
 def capture_image(request):
     if request.method == 'POST' and 'image_data' in request.POST:
-        image_data = request.POST['image_data'].split(',')[1]
-        image_content = ContentFile(base64.b64decode(image_data), name='captured_image.png')
+        get_id = request.POST.get('c_u_id')
 
-            # Save the image to the /captured_images/ folder in the media directory
-        image_path = 'captured_images/captured_image.png'
-        with open(os.path.join(settings.MEDIA_ROOT, image_path), 'wb') as img_file:
-            img_file.write(image_content.read())
+        try:
+            # Retrieve the AppUser based on the custom unique ID
+            user_data = AppUser.objects.get(custom_unique_id=get_id)
+
+            # Process the captured image data
+            image_data = request.POST['image_data'].split(',')[1]
+            image_content = ContentFile(base64.b64decode(image_data), name='captured_image.png')
+
+            # Generate a timestamp for the file name
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+
+            # Create the folder path using the custom unique ID and names
+            folder_path = os.path.join("media", f"{get_id}_{user_data.first_name}_{user_data.last_name}")
+
+            # Check if the folder already exists, and create it if not
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+
+            # Create the file name with the timestamp
+            file_name = f"{user_data.first_name}_{user_data.last_name}_{timestamp}.png"
+
+            # Create the full image path
+            image_path = os.path.join(folder_path, file_name)
+
+            # Save the image file to the specified path
+            with open(os.path.join(settings.MEDIA_ROOT, image_path), 'wb') as img_file:
+                img_file.write(image_content.read())
+
+            # Update the image path in the AppUser model
+            user_data.image_path = image_path
+            user_data.save()
+
             return JsonResponse({'message': 'Image captured and saved successfully!'})
-    else:
-        return render(request, 'core/student.html')
+        
+        except AppUser.DoesNotExist:
+            # Handle the case where the user with the given custom unique ID does not exist
+            return JsonResponse({'error': 'User not found'}, status=404)
     
+    else:
+        get_data = AppUser.objects.filter(is_superuser=False)
+        context = {'user_data': get_data}
+        return render(request, 'core/capture_image.html', context)
+    
+def train_system(dataset_path):
+    known_face_encodings = []
+    known_face_names = []
+
+    for person_folder in os.listdir(dataset_path):
+        person_path = os.path.join(dataset_path, person_folder)
+        if os.path.isdir(person_path):
+            person_name = input(f"Enter the name for the person in {person_folder}: ")
+            
+            for image_file in os.listdir(person_path):
+                image_path = os.path.join(person_path, image_file)
+
+                # Load the image
+                image = face_recognition.load_image_file(image_path)
+
+                # Get the face encoding
+                face_encoding = face_recognition.face_encodings(image)
+                
+                if len(face_encoding) > 0:
+                    # Store the face encoding and the corresponding person's name
+                    known_face_encodings.append(face_encoding[0])
+                    known_face_names.append(person_name)
+
+    # Save the trained data
+    with open('trained_data.dat', 'wb') as file:
+        data = {'encodings': known_face_encodings, 'names': known_face_names}
+        pickle.dump(data, file)
+
+if __name__ == "__main__":
+    dataset_path = input("Enter the path to the dataset: ")
+    train_system(dataset_path)
+    print("Training completed.")
+
+def recognize_faces(image_path):
+    # Load the trained data
+    with open('trained_data.dat', 'rb') as file:
+        data = pickle.load(file)
+        known_face_encodings = data['encodings']
+        known_face_names = data['names']
+
+    # Load the image
+    unknown_image = face_recognition.load_image_file(image_path)
+
+    # Find face locations and encodings
+    face_locations = face_recognition.face_locations(unknown_image)
+    face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
+
+    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+        # Check if the face matches any known face
+        matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.5)
+
+
+        name = "Unknown"
+
+        if True in matches:
+            first_match_index = matches.index(True)
+            name = known_face_names[first_match_index]
+
+        print(f"Person: {name}, Location: {top},{right},{bottom},{left}")
+
+if __name__ == "__main__":
+    image_path = input("Enter the path to the image for recognition: ")
+    recognize_faces(image_path)

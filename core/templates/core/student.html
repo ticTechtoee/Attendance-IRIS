@@ -4,7 +4,7 @@
 <html>
 
 <head>
-    <title>Student Registration Form</title>
+    <title>Registration Form | 1</title>
     <link href="{% static 'CSS/student_reg.css' %}" rel="stylesheet" type="text/css">
     <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
@@ -21,7 +21,7 @@
                 <li><a href="#"><i class="fas fa-user"></i>Register Teacher</a></li>
                 <li><a href="#"><i class="fas fa-sign-out"></i>Logout</a></li>
                 <li><a href="#"><i class="fas fa-question-circle"></i>Help</a></li>
-            </ul> 
+            </ul>
         </div>
         <div class="full_reg_form">
             <div class="reg_form">
@@ -30,50 +30,54 @@
                     <table style="width: 100%;">
                         <caption>Registration form</caption>
                         <tr>
-                            <th>Student Name</th>
-                            <td><input type="text" class="input" name="fname" maxlength="30" title="Enter Name"
-                                    placeholder="Enter Student Name" required /></td>
-                        </tr>
-                        <tr>
-                            <th>Student Arid ID</th>
-                            <td><input type="text" class="input" name="student_id" placeholder="Enter Student ID"
-                                    required />
-                                <span style="color:red">{{useriderror}}</span>
+                            <th>Unique ID</th>
+                            <td><input type="text" class="input" name="Unique_ID"
+                                    placeholder="Unique ID for Each Person" required />
                             </td>
 
                         </tr>
                         <tr>
-                            <th>Student Department</th>
+                            <th>Username</th>
+                            <td><input type="text" class="input" name="username" maxlength="30" title="Enter username"
+                                    placeholder="Enter username" required /></td>
+                        </tr>
+                        <tr>
+                            <th>First Name</th>
+                            <td><input type="text" class="input" name="fname" maxlength="30" title="Enter Name"
+                                    placeholder="Enter Person Name" required /></td>
+                        </tr>
+                        <tr>
+                            <th>Last Name</th>
+                            <td><input type="text" class="input" name="lname" maxlength="30" title="Enter Name"
+                                    placeholder="Enter Person Name" required /></td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td><input type="email" class="input" name="email" maxlength="30" title="Enter Email"
+                                    placeholder="Enter Valid Email" required /></td>
+                        </tr>
+                        <tr>
+                            <th>Department</th>
                             <td>
-                                <select name="department" id="department" class="input" class="form-control" placeholder="Department"
-                                    required>
+
+                                <select name="department" id="department" class="input" class="form-control"
+                                    placeholder="Department" required>
                                     <option value="" disabled selected>Department</option>
-                                    <option value="Computer Science">Computer Science</option>
-                                    <option value="Life Science">Life Science</option>
-                                    <option value="BBA">BBA</option>
-                                    <option value="Math">Math</option>
+                                    {% for names in dept_names %}
+                                    <option value="{{names.id}}">{{names.department_name}}</option>
+                                    {% endfor %}
                                 </select>
                             </td>
                         </tr>
+                        {% if app_type.type_app == "OTHER" %}
+                        {% else %}
                         <tr>
                             <th>Student Program</th>
                             <td>
-                                <select name="program" id="program" class="input" class="form-control" placeholder="Student Program"
-                                    required>
+                                <select name="program" id="program" class="input" class="form-control"
+                                    placeholder="Student Program" required>
                                     <option value="" disabled selected>Student Program</option>
-                                    <option value="BSCS">BSCS</option>
-                                    <option value="BSIT">BSIT</option>
-                                    <option value="BSCS (AI)">BSCS (AI)</option>
-                                    <option value="BSSE">BSSE</option>
-                                    <option value="BS Zoology">BS Zoology</option>
-                                    <option value="BS Botany">BS Botany</option>
-                                    <option value="BS Biochemistry">BS Biochemistry</option>
-                                    <option value="BS Math">BS Math</option>
-                                    <option value="BS Microbiology">BS Microbiology</option>
-
-                                    <option value="BS HND">BS HND</option>
-                                    <option value="BBA 2 Years">BBA 2 Years</option>
-                                    <option value="BBA">BBA</option>
+                                    
 
 
                                 </select>
@@ -82,21 +86,14 @@
                         <tr>
                             <th>Student Semester</th>
                             <td>
-                                <select name="semester" id="semester" class="input" class="form-control" placeholder="Semester"
-                                    required>
+                                <select name="semester" id="semester" class="input" class="form-control"
+                                    placeholder="Semester" required>
                                     <option value="" disabled selected>Select Semester</option>
-                                    <option value=1>Semester 1</option>
-                                    <option value=2>Semester 2</option>
-                                    <option value=3>Semester 3</option>
-                                    <option value=4>Semester 4</option>
-                                    <option value=5>Semester 5</option>
-                                    <option value=6>Semester 6</option>
-                                    <option value=7>Semester 7</option>
-                                    <option value=8>Semester 8</option>
+                                    
                                 </select>
                             </td>
                         </tr>
-
+                        {% endif %}
                         <tr>
                             <td colspan="2">
                                 <input class="reg_btn" type="submit" />
@@ -105,23 +102,12 @@
                         </tr>
                     </table>
 
-            </div>
-            <div class="cam">
-                <div class="video-wrap">
-                    <video id="video" width="640" height="480" autoplay></video>
-    
-                </div>
-                <div class="controller"><input type="submit" id="snap" class="student-pic-btn" value="Take Picture">
-                </div>
-    
+                </form>
             </div>
 
-            
-            </form>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="{% static '/assets/js/webcam.js' %}"></script>
+
 </body>
 
 </html>

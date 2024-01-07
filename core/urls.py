@@ -6,8 +6,8 @@ from . import views
 app_name = "core"
 
 urlpatterns = [
-    path('welcome', views.SetProjectNameView, name = "ViewWelcomePage"),
-    path('index', views.IndexPageView, name="index"),
-    path('regstudent', views.RegisterStudentView, name="ViewRegisterStudent"),
+    path('', views.SetProjectNameView, name = "ViewWelcomePage"),
+    path('index/', views.IndexPageView, name="index"),
+    path('person_registration/', views.RegisterPersonView, name="ViewRegisterPerson"),
     path('capture_image/', views.capture_image, name="ViewCaptureImage"),
 ]
