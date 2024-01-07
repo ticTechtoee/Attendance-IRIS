@@ -50,7 +50,7 @@ def RegisterPersonView(request):
         if AppUser.save:
             # Create a folder in the media directory using the unique ID, first name, and last name
             folder_name = f"{u_id}_{first_name}_{last_name}"
-            media_folder_path = os.path.join("media", folder_name)
+            media_folder_path = os.path.join("media/dataset/", folder_name)
 
             # Check if the folder already exists, and create it if not
             if not os.path.exists(media_folder_path):
@@ -88,7 +88,7 @@ def capture_image(request):
             folder_name = f"{get_id}_{user_data.first_name}_{user_data.last_name}"
             
             # Create the folder path using the custom unique ID and names
-            folder_path = os.path.join(media_root, folder_name)
+            folder_path = os.path.join(media_root + "/dataset", folder_name)
 
             # Create the file name with the timestamp
             file_name = f"{user_data.first_name}_{user_data.last_name}_{timestamp}.png"
@@ -130,14 +130,24 @@ def capture_image(request):
         return render(request, 'core/capture_image.html', context)
     
 def train_system(dataset_path):
-    known_face_encodings = []
-    known_face_names = []
+    known_persons_data = []  # List to store data for each person
 
     for person_folder in os.listdir(dataset_path):
         person_path = os.path.join(dataset_path, person_folder)
         if os.path.isdir(person_path):
-            person_name = input(f"Enter the name for the person in {person_folder}: ")
-            
+            # Extracting ID, first name, and last name from folder name
+            folder_parts = person_folder.split('_')
+            if len(folder_parts) == 3:
+                person_id, first_name, last_name = folder_parts
+                person_name = f"{first_name} {last_name}"
+                print(f"Person ID: {person_id}, Name: {person_name}")
+            else:
+                print(f"Skipping folder {person_folder} due to incorrect naming format.")
+                continue
+
+            # Dictionary to store data for the current person
+            person_data = {'id': person_id, 'name': person_name, 'encodings': []}
+
             for image_file in os.listdir(person_path):
                 image_path = os.path.join(person_path, image_file)
 
@@ -146,21 +156,34 @@ def train_system(dataset_path):
 
                 # Get the face encoding
                 face_encoding = face_recognition.face_encodings(image)
-                
+
                 if len(face_encoding) > 0:
-                    # Store the face encoding and the corresponding person's name
-                    known_face_encodings.append(face_encoding[0])
-                    known_face_names.append(person_name)
+                    # Store the face encoding
+                    person_data['encodings'].append(face_encoding[0])
+
+            # Append the person's data to the list
+            known_persons_data.append(person_data)
+
+    trained_data_folder_name = "trained_data"
+    dat_file_folder = os.path.join(settings.BASE_DIR, trained_data_folder_name)
+
+    if not os.path.exists(dat_file_folder):
+        os.makedirs(dat_file_folder)
 
     # Save the trained data
-    with open('trained_data.dat', 'wb') as file:
-        data = {'encodings': known_face_encodings, 'names': known_face_names}
-        pickle.dump(data, file)
+    with open(os.path.join(dat_file_folder, 'trained_data.dat'), 'wb') as file:
+        pickle.dump(known_persons_data, file)
 
-if __name__ == "__main__":
-    dataset_path = input("Enter the path to the dataset: ")
-    train_system(dataset_path)
-    print("Training completed.")
+def TrainOnDataView(request):
+    context = {}
+    if request.method == 'POST':
+        datasetfolder_name = "dataset"
+        dataset_path = os.path.join(settings.MEDIA_ROOT, datasetfolder_name)
+        train_system(dataset_path)
+        context = {'Message':'Training completed on the active Dataset'}
+        return render(request, 'core/train_data.html', context)
+    return render(request, 'core/train_data.html', context)
+   
 
 def recognize_faces(image_path):
     # Load the trained data

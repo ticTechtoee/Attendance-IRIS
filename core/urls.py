@@ -10,4 +10,5 @@ urlpatterns = [
     path('index/', views.IndexPageView, name="index"),
     path('person_registration/', views.RegisterPersonView, name="ViewRegisterPerson"),
     path('capture_image/', views.capture_image, name="ViewCaptureImage"),
+    path('model_training/', views.TrainOnDataView, name="ViewTrainData"),
 ]
