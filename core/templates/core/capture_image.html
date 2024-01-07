@@ -34,7 +34,7 @@
                                 <th>Select Unique ID</th>
                                 <td>
                                     <select name="c_u_id" id="semester" class="input" class="form-control"
-                                        placeholder="Semester" required>
+                                        placeholder="Unique ID" required>
                                         <option value="" disabled selected>Select ID</option>
                                         {% for user in user_data %}
                                         <option value="{{user.custom_unique_id}}">{{user.custom_unique_id}}</option>

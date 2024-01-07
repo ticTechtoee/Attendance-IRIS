@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const video = document.getElementById('video');
     const captureButton = document.getElementById('snap');
+    const getuserid = document.getElementById('semester');
 
     navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
@@ -23,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
         $.ajax({
             url: '/capture_image/',
             method: 'POST',
-            data: { image_data: imageData },
+            data: { image_data: imageData, user_id:getuserid.value },
             success: function () {
                 console.log('Image captured and saved!');
             },

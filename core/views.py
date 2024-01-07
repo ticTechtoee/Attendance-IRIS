@@ -72,29 +72,41 @@ def add_padding(data):
 @csrf_exempt
 def capture_image(request):
     if request.method == 'POST' and 'image_data' in request.POST:
-        get_id = request.POST.get('c_u_id')
+        get_id = request.POST.get('user_id')
+        
 
         try:
             # Retrieve the AppUser based on the custom unique ID
             user_data = AppUser.objects.get(custom_unique_id=get_id)
+            
 
-            # Process the captured image data
-            image_data = request.POST['image_data'].split(',')[1]
-            image_content = ContentFile(base64.b64decode(image_data), name='captured_image.png')
-
+            # Get the media root from Django settings
+            media_root = settings.MEDIA_ROOT
             # Generate a timestamp for the file name
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-
+            
+            folder_name = f"{get_id}_{user_data.first_name}_{user_data.last_name}"
+            
             # Create the folder path using the custom unique ID and names
-            folder_path = os.path.join("media", f"{get_id}_{user_data.first_name}_{user_data.last_name}")
-
-            # Check if the folder already exists, and create it if not
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
+            folder_path = os.path.join(media_root, folder_name)
 
             # Create the file name with the timestamp
             file_name = f"{user_data.first_name}_{user_data.last_name}_{timestamp}.png"
-
+                       
+            try:
+                # Check if the folder already exists, and create it if not
+                if not os.path.exists(folder_path):
+                    os.makedirs(folder_path)
+                    print(f"Folder '{folder_name}' created successfully at '{folder_path}'.")
+                else:
+                    print(f"Folder '{folder_name}' already exists at '{folder_path}'.")
+            except Exception as e:
+                print(f"Error creating folder: {e}")
+            
+            # Process the captured image data
+            image_data = request.POST['image_data'].split(',')[1]
+            image_content = ContentFile(base64.b64decode(image_data), name=file_name)        
+            
             # Create the full image path
             image_path = os.path.join(folder_path, file_name)
 
