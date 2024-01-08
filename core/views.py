@@ -8,6 +8,10 @@ from django.core.files.storage import default_storage
 from .models import ApplicationName,ApplicationType,Department
 from django.http import HttpResponse
 
+from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font
+
 from AccountApp.models import AppUser, Attendance
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
@@ -283,11 +287,37 @@ def AttendenceSearchView(request):
 
 def AttendenceRecordView(request, pk):
     get_user = get_object_or_404(AppUser, custom_unique_id=pk)
-    
-    print(get_user)
-    # Use filter to get a queryset, and check if any records exist
     get_attendance_record = Attendance.objects.filter(user=get_user)
-    
-    print(get_attendance_record)
+
+    # Check if export button is clicked
+    if 'export' in request.GET:
+        # Create a workbook and add a worksheet
+        wb = Workbook()
+        ws = wb.active
+
+        # Define header row
+        header = ['Unique ID', 'User Name', 'Date', 'Time', 'Present']
+        for col_num, header_text in enumerate(header, 1):
+            col_letter = get_column_letter(col_num)
+            ws[f'{col_letter}1'] = header_text
+            ws[f'{col_letter}1'].font = Font(bold=True)
+
+        # Populate data rows
+        for row_num, attendance in enumerate(get_attendance_record, 2):
+            ws.cell(row=row_num, column=1, value=get_user.custom_unique_id)
+            ws.cell(row=row_num, column=2, value=get_user.username)
+            ws.cell(row=row_num, column=3, value=attendance.date)
+            ws.cell(row=row_num, column=4, value=attendance.time)
+            ws.cell(row=row_num, column=5, value=attendance.is_present)
+
+        # Create a response object with the appropriate headers
+        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = f'attachment; filename={get_user.custom_unique_id}_attendance_record.xlsx'
+
+        # Save the workbook to the response
+        wb.save(response)
+
+        return response
+
     context = {'Attendance_Record': get_attendance_record, 'User': get_user}
     return render(request, 'core/person_record.html', context)
