@@ -101,13 +101,13 @@
       border: none;
   }
 
-  table th{
+  /* table th{
         float: left;
         padding: 25px;
         padding-right: 50px !important;
         color: #555 !important;
         padding-bottom: 10px;
-  }
+  } */
 
   caption{
       margin: 15px 0;

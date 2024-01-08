@@ -2,7 +2,7 @@ import face_recognition
 import os
 import base64
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from .models import ApplicationName,ApplicationType,Department
@@ -268,3 +268,26 @@ def Mark_Attendance(unique_ID):
     attendance.save()
 
     return HttpResponse("Attendance Marked")
+
+def AttendenceSearchView(request):
+    get_deptt_name = Department.objects.all()
+    users_in_department = None  # Initialize the variable
+
+    if request.method == 'POST':
+        select_deptt_name = request.POST.get('search_field')
+        get_deptt_object = Department.objects.get(id=select_deptt_name)
+        users_in_department = AppUser.objects.filter(department=get_deptt_object)
+    
+    context = {'Department_Names': get_deptt_name, 'Users_Info': users_in_department}
+    return render(request, 'core/attendence_search.html', context)
+
+def AttendenceRecordView(request, pk):
+    get_user = get_object_or_404(AppUser, custom_unique_id=pk)
+    
+    print(get_user)
+    # Use filter to get a queryset, and check if any records exist
+    get_attendance_record = Attendance.objects.filter(user=get_user)
+    
+    print(get_attendance_record)
+    context = {'Attendance_Record': get_attendance_record, 'User': get_user}
+    return render(request, 'core/person_record.html', context)

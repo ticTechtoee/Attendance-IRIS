@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+
+<head>
+    <title>Search</title>
+    <link href="{% static 'CSS/teacher_reg.css' %}" rel="stylesheet" type="text/css">
+    <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="sidebar">
+            <!-- Your sidebar content here -->
+        </div>
+        <div class="full_reg_form d-flex flex-column">
+
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <select name="search_field" id="search_field">
+                    <option value="" disabled selected>Department</option>
+                    {% for names in Department_Names  %}
+                    <option value="{{names.id}}">{{names.department_name}}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-primary mb-2">Search</button>
+            </form>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Unique ID</th>
+                            <th scope="col">User Name</th>
+                            <th scope="col">First Name</th>
+                            <th scope="col">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for information in Users_Info %}
+                        <tr>
+                            <th scope="row">{{forloop.counter}}</th>
+                            <td><a href="{% url 'core:ViewAttendenceRecord' information.custom_unique_id %}">{{information.custom_unique_id}}</a></td>
+                            <td>{{information.username}}</td>
+                            <td>{{information.first_name}}</td>
+                            <td>{{information.email}}</td>
+                           
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -12,4 +12,6 @@ urlpatterns = [
     path('capture_image/', views.capture_image, name="ViewCaptureImage"),
     path('model_training/', views.TrainOnDataView, name="ViewTrainData"),
     path('detect_person/', views.DetectPersonView, name="ViewDetectPerson"),
+    path('search_attendence/', views.AttendenceSearchView, name="ViewAttendenceSearch"),
+    path('person_attendence_record/<str:pk>/', views.AttendenceRecordView, name="ViewAttendenceRecord")
 ]
