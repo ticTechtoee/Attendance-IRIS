@@ -7,6 +7,8 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from .models import ApplicationName,ApplicationType,Department
 from django.http import HttpResponse
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -39,19 +41,34 @@ def RegisterPersonView(request):
     except ApplicationType.DoesNotExist:
         # Handle the case where no record is found
         get_application_type = None
+
     if request.method == 'POST':
         u_id = request.POST.get('Unique_ID')
         user_name = request.POST.get('username')
         first_name = request.POST.get('fname')
         last_name = request.POST.get('lname')
         email = request.POST.get('email')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
         deptt = request.POST.get('department')
-        
-        get_deptt = Department.objects.get(id = deptt)
 
-        AppUser(custom_unique_id=u_id, username=user_name, first_name = first_name, last_name = last_name, email= email, department=get_deptt).save()
+        # Ensure passwords match
+        if password != confirm_password:
+            # Handle the case where passwords do not match
+            return render(request, "core/student.html", {'dept_names': get_dept_name, 'app_type': get_application_type, 'error_message': 'Passwords do not match'})
 
-        if AppUser.save:
+        # Hash the password
+        hashed_password = make_password(password)
+
+        # Get the department
+        get_deptt = Department.objects.get(id=deptt)
+
+        # Create the user
+        user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
+                       email=email, department=get_deptt, password=hashed_password)
+        user.save()
+
+        if user:
             # Create a folder in the media directory using the unique ID, first name, and last name
             folder_name = f"{u_id}_{first_name}_{last_name}"
             media_folder_path = os.path.join("media/dataset/", folder_name)
@@ -59,11 +76,11 @@ def RegisterPersonView(request):
             # Check if the folder already exists, and create it if not
             if not os.path.exists(media_folder_path):
                 os.makedirs(media_folder_path)
-        return redirect('core:ViewCaptureImage')
-    
-    context = {'dept_names':get_dept_name, 'app_type':get_application_type}
-    return render(request, "core/student.html", context)
 
+        return redirect('core:ViewCaptureImage')
+
+    context = {'dept_names': get_dept_name, 'app_type': get_application_type}
+    return render(request, "core/student.html", context)
 
 
 def add_padding(data):
@@ -118,7 +135,7 @@ def capture_image(request):
                 img_file.write(image_content.read())
 
             # Update the image path in the AppUser model
-            user_data.image_path = image_path
+            #user_data.image_path = image_path
             user_data.save()
 
             return JsonResponse({'message': 'Image captured and saved successfully!'})
