@@ -24,38 +24,39 @@
         
           <div class="column" style="background-color: #15A085;">
             <div class="card" style="background-color: #15A085;">
-              <a href="#"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
-              <p>Register Student</p>
+              <a href="{% url 'core:ViewRegisterPerson' %}"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
+              <p>Register Person</p>
             </div>
           </div>
           
           <div class="column" style="background-color: #F39C13;">
             <div class="card" style="background-color: #F39C13;">
-              <a href="#"><img src ={% static '/Images/search_icon.png' %}/></a>
-              <p>Search & Update Record</p>
+              <a href="{% url 'core:ViewAttendenceSearch' %}"><img src ={% static '/Images/search_icon.png' %}/></a>
+              <p>Search</p>
             </div>
           </div>
 
           <div class="column" style="background-color: #2A80B9;">
             <div class="card" style="background-color: #2A80B9;">
-              <a href="#"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
-              <p>Register Teacher</p>
+              <a href="{% url 'core:ViewTrainData' %}"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
+              <p>Train Model</p>
             </div>
           </div>
         
+          <div class="column" style="background-color: #8E44AD;">
+            <div class="card" style="background-color: #8E44AD;">
+              <a href="{% url 'core:ViewDetectPerson' %}"><img src ={% static '/Images/help_icon.png' %}/></a>
+              <p>Mark Attendece</p>
+            </div>
+          </div>
+
           <div class="column" style="background-color: #E74C3D;">
             <div class="card" style="background-color: #E74C3D;">
-              <a href="#"><img src ={% static '/Images/logout_icon.png' %}/></a>
+              <a href="{% url 'AccountApp:ViewLogout' %}"><img src ={% static '/Images/logout_icon.png' %}/></a>
               <p>Logout</p>
             </div>
           </div>
           
-          <div class="column" style="background-color: #8E44AD;">
-            <div class="card" style="background-color: #8E44AD;">
-              <a href="#"><img src ={% static '/Images/help_icon.png' %}/></a>
-              <p>Help</p>
-            </div>
-          </div>
           
         </div>
 

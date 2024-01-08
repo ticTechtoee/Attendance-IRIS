@@ -9,6 +9,7 @@ from .models import ApplicationName,ApplicationType,Department
 from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import user_passes_test, login_required
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -20,19 +21,23 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import pickle
 
+def is_admin(user):
+    return user.is_authenticated and user.is_superuser
+
+
 
 def SetProjectNameView(request):
     set_name =  ApplicationName.objects.latest('id')
     context = {'Name_of_Project': set_name}
     return render(request, 'core/welcome.html', context)
 
-
+@login_required(login_url="AccountApp:custom_login")
 def IndexPageView(request):
     set_logo = ApplicationName.objects.latest('id')
-    print("Logo URL:", set_logo.logo_of_project.url)
     context = {'Set_Logo': set_logo}
     return render(request, 'core/index.html', context)
 
+@user_passes_test(is_admin, login_url="AccountApp:custom_login")
 def RegisterPersonView(request):
     get_dept_name = Department.objects.all()
     try:
@@ -91,6 +96,7 @@ def add_padding(data):
     return data
 
 @csrf_exempt
+@user_passes_test(is_admin, login_url="AccountApp:custom_login")
 def capture_image(request):
     if request.method == 'POST' and 'image_data' in request.POST:
         get_id = request.POST.get('user_id')
@@ -192,7 +198,7 @@ def train_system(dataset_path):
         data = {'encodings': known_face_encodings, 'names': known_face_names}
         pickle.dump(data, file)
 
-
+@user_passes_test(is_admin, login_url="AccountApp:custom_login")
 def TrainOnDataView(request):
     context = {}
     if request.method == 'POST':
@@ -205,6 +211,7 @@ def TrainOnDataView(request):
    
 
 @csrf_exempt
+@login_required(login_url="AccountApp:custom_login")
 def DetectPersonView(request):
     if request.method == 'POST' and 'image_data' in request.POST:
             try:
@@ -290,6 +297,7 @@ def Mark_Attendance(unique_ID):
 
     return HttpResponse("Attendance Marked")
 
+@login_required(login_url="AccountApp:custom_login")
 def AttendenceSearchView(request):
     get_deptt_name = Department.objects.all()
     users_in_department = None  # Initialize the variable
@@ -302,6 +310,7 @@ def AttendenceSearchView(request):
     context = {'Department_Names': get_deptt_name, 'Users_Info': users_in_department}
     return render(request, 'core/attendence_search.html', context)
 
+@login_required(login_url="AccountApp:custom_login")
 def AttendenceRecordView(request, pk):
     get_user = get_object_or_404(AppUser, custom_unique_id=pk)
     get_attendance_record = Attendance.objects.filter(user=get_user)
