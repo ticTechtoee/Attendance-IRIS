@@ -24,3 +24,15 @@ class AppUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+class Attendance(models.Model):
+    user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
+    date = models.DateField()
+    time = models.TimeField()
+    is_present = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ['user', 'date', 'time']
+
+    def __str__(self):
+        return f"{self.user} - {self.date} {self.time}"

@@ -1,20 +1,19 @@
+import face_recognition
+import os
 import base64
-from django.core.files.storage import default_storage
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from .models import ApplicationName,ApplicationType
-import os
-from .models import Department
-from AccountApp.models import AppUser
+from .models import ApplicationName,ApplicationType,Department
+from django.http import HttpResponse
+
+from AccountApp.models import AppUser, Attendance
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-
-import face_recognition
-
 import pickle
+
 
 def SetProjectNameView(request):
     set_name =  ApplicationName.objects.latest('id')
@@ -253,3 +252,19 @@ def recognize_faces(image_path):
         person_name = person_info['name']
 
         print(f"Person ID: {person_id}, Person Name: {person_name}, Location: {top},{right},{bottom},{left}")
+        Mark_Attendance(person_id)
+        
+def Mark_Attendance(unique_ID):
+    # Retrieve the user
+    user = AppUser.objects.get(custom_unique_id=unique_ID)
+
+    # Get the current date and time
+    current_date = datetime.now().date()
+    current_time = datetime.now().time()
+
+    # Create or update the attendance record
+    attendance, created = Attendance.objects.get_or_create(user=user, date=current_date, time=current_time)
+    attendance.is_present = True
+    attendance.save()
+
+    return HttpResponse("Attendance Marked")
