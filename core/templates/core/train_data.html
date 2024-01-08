@@ -12,17 +12,7 @@
 
 <body>
     <div class="wrapper">
-        <div class="sidebar">
-            <a href="#"><img src={% static 'Images/FRAS_Logo.png' %}></a>
-            <ul>
-                <li><a href="#"><i class="fas fa-home"></i>Home</a></li>
-                <li><a href="#"><i class="fas fa-user"></i>Register Student</a></li>
-                <li><a href="#"><i class="fas fa-search"></i>Search & Update</a></li>
-                <li><a href="#"><i class="fas fa-user"></i>Register Teacher</a></li>
-                <li><a href="#"><i class="fas fa-sign-out"></i>Logout</a></li>
-                <li><a href="#"><i class="fas fa-question-circle"></i>Help</a></li>
-            </ul>
-        </div>
+        {% include "core/sidebar.html" %}
         <div class="full_reg_form">
             <div class="reg_form">
                 <h2>Train Data</h2>

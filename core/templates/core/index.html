@@ -3,7 +3,7 @@
 
 <html lang="en">
 <head>
-	<title>Face Recognition Attendance System</title>
+	<title>IRIS Attendece System</title>
   <link href="{% static 'CSS/index-style.css' %}" rel="stylesheet" type="text/css">
   <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
 	<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
@@ -11,17 +11,7 @@
 </head>
 <body>
 <div class="wrapper">
-    <div class="sidebar">
-        <a href="{% url 'core:index' %}"><img src="{{Set_Logo.logo_of_project.url}}"></a>
-        <ul>
-          <li><a href="{% url 'core:index' %}"><i class="fas fa-home"></i>Home</a></li>
-              <li><a href="#"><i class="fas fa-user"></i>Register Student</a></li>
-              <li><a href="#"><i class="fas fa-search"></i>Search & Update</a></li>
-              <li><a href="#"><i class="fas fa-user"></i>Register Teacher</a></li>
-              <li><a href="#"><i class="fas fa-sign-out"></i>Logout</a></li>
-              <li><a href="#"><i class="fas fa-question-circle"></i>Help</a></li>
-          </ul> 
-    </div>
+    {% include "core/sidebar.html" %}
     <div class="main_content">
       {% csrf_token %}
         <div class="row">
