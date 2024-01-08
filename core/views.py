@@ -11,8 +11,9 @@ from AccountApp.models import AppUser
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
-import os
+
 import face_recognition
+
 import pickle
 
 def SetProjectNameView(request):
@@ -73,8 +74,6 @@ def add_padding(data):
 def capture_image(request):
     if request.method == 'POST' and 'image_data' in request.POST:
         get_id = request.POST.get('user_id')
-        
-
         try:
             # Retrieve the AppUser based on the custom unique ID
             user_data = AppUser.objects.get(custom_unique_id=get_id)
@@ -82,6 +81,7 @@ def capture_image(request):
 
             # Get the media root from Django settings
             media_root = settings.MEDIA_ROOT
+        
             # Generate a timestamp for the file name
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
             
@@ -128,41 +128,37 @@ def capture_image(request):
         get_data = AppUser.objects.filter(is_superuser=False)
         context = {'user_data': get_data}
         return render(request, 'core/capture_image.html', context)
-    
+
 def train_system(dataset_path):
-    known_persons_data = []  # List to store data for each person
+    known_face_encodings = []
+    known_face_names = []
 
     for person_folder in os.listdir(dataset_path):
         person_path = os.path.join(dataset_path, person_folder)
         if os.path.isdir(person_path):
-            # Extracting ID, first name, and last name from folder name
+
             folder_parts = person_folder.split('_')
             if len(folder_parts) == 3:
-                person_id, first_name, last_name = folder_parts
+                person_id, first_name, last_name = folder_parts[0], folder_parts[1], folder_parts[2]
+                
                 person_name = f"{first_name} {last_name}"
-                print(f"Person ID: {person_id}, Name: {person_name}")
-            else:
-                print(f"Skipping folder {person_folder} due to incorrect naming format.")
-                continue
-
-            # Dictionary to store data for the current person
-            person_data = {'id': person_id, 'name': person_name, 'encodings': []}
 
             for image_file in os.listdir(person_path):
                 image_path = os.path.join(person_path, image_file)
+                print(person_path)
+                print("")
+                print(image_file)
 
                 # Load the image
                 image = face_recognition.load_image_file(image_path)
 
                 # Get the face encoding
                 face_encoding = face_recognition.face_encodings(image)
-
+                
                 if len(face_encoding) > 0:
-                    # Store the face encoding
-                    person_data['encodings'].append(face_encoding[0])
-
-            # Append the person's data to the list
-            known_persons_data.append(person_data)
+                    # Store the face encoding and the corresponding person's name
+                    known_face_encodings.append(face_encoding[0])
+                    known_face_names.append({'id': person_id, 'name': person_name})
 
     trained_data_folder_name = "trained_data"
     dat_file_folder = os.path.join(settings.BASE_DIR, trained_data_folder_name)
@@ -170,9 +166,12 @@ def train_system(dataset_path):
     if not os.path.exists(dat_file_folder):
         os.makedirs(dat_file_folder)
 
+    print(dat_file_folder)
     # Save the trained data
     with open(os.path.join(dat_file_folder, 'trained_data.dat'), 'wb') as file:
-        pickle.dump(known_persons_data, file)
+        data = {'encodings': known_face_encodings, 'names': known_face_names}
+        pickle.dump(data, file)
+
 
 def TrainOnDataView(request):
     context = {}
@@ -184,39 +183,6 @@ def TrainOnDataView(request):
         return render(request, 'core/train_data.html', context)
     return render(request, 'core/train_data.html', context)
    
-
-def recognize_faces(image_path):
-    # Load the trained data
-    get_trained_data_path = os.path.join(settings.BASE_DIR, "trained_data")
-    print(get_trained_data_path)
-    with open(get_trained_data_path + '\\trained_data.dat', 'rb') as file:
-        data = pickle.load(file)
-        known_persons_data = data  # Assume 'known_data' contains a list of dictionaries
-
-    # Load the image
-    unknown_image = face_recognition.load_image_file(image_path)
-
-    # Find face locations and encodings
-    face_locations = face_recognition.face_locations(unknown_image)
-    face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
-
-    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
-        # Check if the face matches any known face
-        matches = face_recognition.compare_faces(
-            [person['encodings'] for person in known_persons_data],
-            face_encoding,
-            tolerance=0.5
-        )
-
-        name = "Unknown"
-        person_id = None
-
-        if True in matches:
-            first_match_index = matches.index(True)
-            name = known_persons_data[first_match_index]['name']
-            person_id = known_persons_data[first_match_index]['id']
-
-        print(f"Person: {name}, ID: {person_id}, Location: {top},{right},{bottom},{left}")
 
 @csrf_exempt
 def DetectPersonView(request):
@@ -241,15 +207,49 @@ def DetectPersonView(request):
 
                 # Save the image file to the specified path
                 print(image_path)
-                with open(os.path.join(settings.MEDIA_ROOT, image_path), 'wb') as img_file:
+                with open(image_path, 'wb') as img_file:
                     img_file.write(image_content.read())
 
-                #recognize_faces(image_path)
-
                 print("Recognizing")
+
+                recognize_faces(image_path)
+
             
             except Exception as e:
-                print("Error:" + e)
+                print(e)
             
     context = {}
     return render(request, 'core/detect_person.html', context)
+
+def recognize_faces(image_path):
+    get_trained_data_file = os.path.join(settings.BASE_DIR,"trained_data")
+    complete_path = os.path.join(get_trained_data_file,"trained_data.dat")
+    print(complete_path)
+
+    # Load the trained data
+    with open(complete_path, 'rb') as file:
+        data = pickle.load(file)
+        known_face_encodings = data['encodings']
+        known_face_names = data['names']
+
+    # Load the image
+    unknown_image = face_recognition.load_image_file(image_path)
+
+    # Find face locations and encodings
+    face_locations = face_recognition.face_locations(unknown_image)
+    face_encodings = face_recognition.face_encodings(unknown_image, face_locations)
+
+    for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
+        # Check if the face matches any known face
+        matches = face_recognition.compare_faces(known_face_encodings, face_encoding, tolerance=0.5)
+
+        person_info = {'id': "Unknown", 'name': "Unknown"}
+
+        if True in matches:
+            first_match_index = matches.index(True)
+            person_info = known_face_names[first_match_index]
+
+        person_id = person_info['id']
+        person_name = person_info['name']
+
+        print(f"Person ID: {person_id}, Person Name: {person_name}, Location: {top},{right},{bottom},{left}")
