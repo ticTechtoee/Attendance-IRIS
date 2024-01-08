@@ -3,7 +3,7 @@
 
 <html>
 <head>
-<title>Welcome to Face Attendance System</title>
+<title>Welcome to IRIS Attendance System</title>
 <link href="{% static 'CSS/welcome.css' %}" rel="stylesheet" type="text/css">
 <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
 <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
@@ -15,9 +15,9 @@
         <div class="main-content">
         <h3 class="headline">{{Name_of_Project.application_title}}</h3>
         <p class="description">
-            FRAS uses facial recognition technology to identify and verify a student using the student's facial features and automatically mark attendance.
+            IRIS uses pattern recognition technology to identify and verify a person using the eyes and automatically mark attendance.
         </p>
-        <a href=""><button class="wel-button">
+        <a href="{% url 'AccountApp:custom_login' %}"><button class="wel-button">
         <i class="fas fa-sign-in"></i>Login Here
         </button></a>
         </div>

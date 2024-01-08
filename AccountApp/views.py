@@ -1,16 +1,23 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import authenticate, login
 
-# Create your views here.
 def user_login(request):
     if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            auth_login(request, form.get_user())
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Manually authenticate the user
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # Login the authenticated user
+            login(request, user)
+
             # Redirect to a success page or homepage
             return redirect('core:ViewDetectPerson')
-    else:
-        form = AuthenticationForm(request)
+        else:
+            # Handle authentication failure, e.g., show an error message
+            return render(request, 'AccountApp/login_form.html', {'error_message': 'Invalid credentials'})
 
-    return render(request, 'AccountApp/login_form.html', {'form': form})
+    return render(request, 'AccountApp/login_form.html')
