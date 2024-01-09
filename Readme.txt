@@ -16,6 +16,7 @@ HOW TO RUN THIS PROJECT
 3 -  Go to the "Register Person" page and Register a person for which you want to mark the attendance.
 
 4 -  On the Next Page Capture Multiple Pictures of the person's eye to train the Model.
+<<<<<<< HEAD
 	Select the Unique ID of the Person.
 	Use sophisticated camera IR cameras to capture the Eye Pupil, Pupil structure and Vein Structure.
 	The system is using a Pattern storage system that's why the system will capture and store the pattern of the Training Data. 
@@ -25,8 +26,23 @@ HOW TO RUN THIS PROJECT
 
 5 -  Once Admin is done with capturing the Images of the Persons(Label) go to the "Train Model" page and click on the Train Model Button.
 	The system will automatically train the model on the images and will create a .dat file in a special folder.
+=======
+     Select the Unique ID of the Person.
+     Use sophisticated camera IR cameras to capture the Eye Pupil, Pupil structure and Vein Structure.
+     The system is using a Pattern storage system that's why the system will capture and store the pattern of the Training Data. 
+     Use well lit area to capture the images and take multiple images of a similar area to make the model familiar with the Data.
+     System will automatically save the Image of each person in a seperate folder named after the Unique ID and Name of the Person (e.g: 1001_Farhan_Basheer).
+     Each person will have a separate folder.
+
+5 -  Once Admin is done with capturing the Images of the Persons(Label) go to the "Train Model" page and click on the Train Model Button.
+     The system will automatically train the model on the images and will create a .dat file in a special folder.
+>>>>>>> b3ae1d92af265e135d4ca2de8506d88b3f670568
 
 6 -  Login as a User in the system and take the image to mark the attendence.
 7 -  If the system has recognized the person then it will automatically mark the attendance, save the data in the database.
 8 -  Admin and a User can "Search" the record by visiting the "Search" page.
+<<<<<<< HEAD
 9 -  Admin and User can Generate the report in .xlsx format by clicking on the "Export to Excel button".
+=======
+9 -  Admin and User can Generate the report in .xlsx format by clicking on the "Export to Excel button".
+>>>>>>> b3ae1d92af265e135d4ca2de8506d88b3f670568
