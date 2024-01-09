@@ -241,6 +241,8 @@ def DetectPersonView(request):
 
                 recognize_faces(image_path)
 
+                # Delete Image after recognition
+                os.remove(image_path)
             
             except Exception as e:
                 print(e)
