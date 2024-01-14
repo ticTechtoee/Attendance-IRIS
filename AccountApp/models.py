@@ -8,9 +8,8 @@ class AppUser(AbstractUser):
     department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.DO_NOTHING)
     program = models.ForeignKey(Program, null=True, blank=True, on_delete=models.DO_NOTHING)
     semester = models.ForeignKey(Semester, null=True, blank=True, on_delete=models.DO_NOTHING)
-
-    # Additional field for storing the application type
     application_type = models.ForeignKey(ApplicationType, null=True, blank=True, on_delete=models.DO_NOTHING)
+    hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def save(self, *args, **kwargs):
         # Check if the user has an application type selected

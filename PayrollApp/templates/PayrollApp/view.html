@@ -1,0 +1,30 @@
+<!-- PayrollApp/templates/PayrollApp/salary_report.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Salary Report</title>
+</head>
+<body>
+    <h1>Salary Report for {{ user.custom_unique_id }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Present</th>
+                <th>Daily Salary</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in payroll_data %}
+                <tr>
+                    <td>{{ data.record.date }}</td>
+                    <td>{{ data.record.is_present }}</td>
+                    <td>{{ data.daily_salary }}</td>
+                </tr>
+            {% endfor %}
+            <p>total Salary for this month is: {{total_salary}}</p>
+        </tbody>
+    </table>
+</body>
+</html>

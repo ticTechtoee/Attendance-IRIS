@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'AccountApp.apps.AccountappConfig',
     'core',
+    'PayrollApp.apps.PayrollappConfig',
     #'users',
     'django_summernote',
 
