@@ -1,30 +1,80 @@
-<!-- PayrollApp/templates/PayrollApp/salary_report.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Salary Report</title>
-</head>
-<body>
-    <h1>Salary Report for {{ user.custom_unique_id }}</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Present</th>
-                <th>Daily Salary</th>
-                
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in payroll_data %}
-                <tr>
-                    <td>{{ data.record.date }}</td>
-                    <td>{{ data.record.is_present }}</td>
-                    <td>{{ data.daily_salary }}</td>
-                </tr>
-            {% endfor %}
-            <p>total Salary for this month is: {{total_salary}}</p>
-        </tbody>
-    </table>
-</body>
-</html>
+<!-- PayrollApp/templates/PayrollApp/view.html -->
+{% extends "navbar.html" %}
+{% load static %}
+
+{% block content %}
+<div class="wrapper">
+    {% include "core/sidebar.html" %}
+    <div class="full_reg_form d-flex flex-column">
+        <form action="" method="post" enctype="multipart/form-data" class="form-inline">
+            {% csrf_token %}
+            <div class="form-group mb-2">
+                <input type="text" class="form-control" name="User_ID" style="margin-right: 0;">
+            </div>
+            <button type="submit" class="btn btn-primary mb-2" name="search" style="margin-left: 0;">Search</button>
+            <button type="button" onclick="exportToExcel();" class="btn btn-success mb-2 ml-2">Export to Excel</button>
+        </form>
+
+        {% if Error_Message %}
+        <h1>{{ Error_Message }}</h1>
+        {% else %}
+        <h1 id="id_head">Salary Calculation for {{ user.custom_unique_id }}</h1>
+        <div class="table-responsive">
+            <table class="table" id="myTable">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Date</th>
+                        <th scope="col">Present</th>
+                        <th scope="col">Daily Salary</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in payroll_data %}
+                    <tr>
+                        <td>{{ data.record.date }}</td>
+                        <td>{{ data.record.is_present }}</td>
+                        <td>{{ data.daily_salary }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="2"><strong>Total Salary Calculated for this month is:</strong></td>
+                        <td>{{ total_salary }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+   function exportToExcel() {
+  const heading = document.getElementById("id_head");
+  const table = document.getElementById("myTable");
+  const rows = table.getElementsByTagName("tr");
+  const csvData = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = [], cols = rows[i].querySelectorAll("td, th");
+
+    for (let j = 0; j < cols.length; j++) {
+      row.push(cols[j].innerText);
+    }
+
+    csvData.push(row.join(","));
+  }
+
+  const csvContent = "data:text/csv;charset=utf-8," + csvData.join("\n");
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  const fileName = heading.innerText || heading.value; // Use innerText or value based on the element type
+
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", fileName + "_exported_table.csv");
+  document.body.appendChild(link);
+
+  link.click(); // This will trigger the download
+  document.body.removeChild(link);
+}
+  </script>
+{% endblock content %}
