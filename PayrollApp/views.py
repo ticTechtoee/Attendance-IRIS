@@ -48,10 +48,6 @@ def PayrollView(request):
                     total_salary += daily_salary
                     payroll_data.append({'record': record, 'daily_salary': daily_salary, 'total_salary': total_salary})
 
-                # Export to Excel if the user clicks the export button
-                if 'export_to_excel' in request.POST:
-                    return export_to_excel(user, payroll_data, total_salary)
-
             except AppUser.DoesNotExist:
                 user = None
                 error_message = True
@@ -65,41 +61,3 @@ def PayrollView(request):
 
     return render(request, 'PayrollApp/view.html', context)
 
-def export_to_excel(user, payroll_data, total_salary):
-    # Create a new Workbook
-    workbook = openpyxl.Workbook()
-
-    # Create a worksheet
-    worksheet = workbook.active
-    worksheet.title = "Payroll Report"
-
-    # Write the header row
-    headers = ['Date', 'Present', 'Daily Salary']
-    for col_num, header in enumerate(headers, start=1):
-        worksheet.cell(row=1, column=col_num, value=header).font = Font(bold=True)
-
-    # Write the data rows
-    for row_num, data in enumerate(payroll_data, start=2):
-        worksheet.cell(row=row_num, column=1, value=data['record'].date)
-        worksheet.cell(row=row_num, column=2, value='Yes' if data['record'].is_present else 'No')
-        worksheet.cell(row=row_num, column=3, value=float(data['daily_salary']))  # Convert Decimal to float
-
-    # Write the total salary row
-    worksheet.cell(row=row_num + 1, column=1, value='Total Salary').font = Font(bold=True)
-    worksheet.cell(row=row_num + 1, column=3, value=float(total_salary)).font = Font(bold=True)
-
-    # Create a BytesIO buffer to write the Excel file to
-    output = BytesIO()
-
-    # Save the workbook to the BytesIO buffer
-    workbook.save(output)
-
-    # Set up response headers for an Excel file
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = f'attachment; filename={user.custom_unique_id}_payroll.xlsx'
-
-    # Write the Excel file to the response
-    output.seek(0)
-    response.write(output.getvalue())
-
-    return response
