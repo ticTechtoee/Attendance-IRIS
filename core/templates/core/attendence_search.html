@@ -16,12 +16,12 @@
         {% include "core/sidebar.html" %}
         <div class="full_reg_form d-flex flex-column">
 
-            <form action="" method="post" enctype="multipart/form-data">
+            <form action="" method="get" enctype="multipart/form-data">
                 {% csrf_token %}
                 <select name="search_field" id="search_field">
                     <option value="" disabled selected>Department</option>
                     {% for names in Department_Names  %}
-                    <option value="{{names.id}}">{{names.department_name}}</option>
+                    <option value="{{ names.id }}" {% if names.id == request.GET.search_field %}selected{% endif %}>{{ names.department_name }}</option>
                     {% endfor %}
                 </select>
                 <button type="submit" class="btn btn-primary mb-2">Search</button>
@@ -45,11 +45,29 @@
                             <td>{{information.username}}</td>
                             <td>{{information.first_name}}</td>
                             <td>{{information.email}}</td>
-                           
+
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+                <!-- Add pagination links below the table -->
+<div class="pagination">
+    <span class="step-links">
+        {% if Users_Info.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ Users_Info.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ Users_Info.number }} of {{ Users_Info.paginator.num_pages }}.
+        </span>
+
+        {% if Users_Info.has_next %}
+            <a href="?page={{ Users_Info.next_page_number }}">next</a>
+            <a href="?page={{ Users_Info.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
             </div>
         </div>
     </div>

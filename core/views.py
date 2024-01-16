@@ -1,3 +1,4 @@
+from django.contrib import messages
 import face_recognition
 import os
 import base64
@@ -10,6 +11,7 @@ from django.http import HttpResponse
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import user_passes_test, login_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -103,22 +105,22 @@ def capture_image(request):
         try:
             # Retrieve the AppUser based on the custom unique ID
             user_data = AppUser.objects.get(custom_unique_id=get_id)
-            
+
 
             # Get the media root from Django settings
             media_root = settings.MEDIA_ROOT
-        
+
             # Generate a timestamp for the file name
             timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-            
+
             folder_name = f"{get_id}_{user_data.first_name}_{user_data.last_name}"
-            
+
             # Create the folder path using the custom unique ID and names
             folder_path = os.path.join(media_root + "/dataset", folder_name)
 
             # Create the file name with the timestamp
             file_name = f"{user_data.first_name}_{user_data.last_name}_{timestamp}.png"
-                       
+
             try:
                 # Check if the folder already exists, and create it if not
                 if not os.path.exists(folder_path):
@@ -128,11 +130,11 @@ def capture_image(request):
                     print(f"Folder '{folder_name}' already exists at '{folder_path}'.")
             except Exception as e:
                 print(f"Error creating folder: {e}")
-            
+
             # Process the captured image data
             image_data = request.POST['image_data'].split(',')[1]
-            image_content = ContentFile(base64.b64decode(image_data), name=file_name)        
-            
+            image_content = ContentFile(base64.b64decode(image_data), name=file_name)
+
             # Create the full image path
             image_path = os.path.join(folder_path, file_name)
 
@@ -145,11 +147,11 @@ def capture_image(request):
             user_data.save()
 
             return JsonResponse({'message': 'Image captured and saved successfully!'})
-        
+
         except AppUser.DoesNotExist:
             # Handle the case where the user with the given custom unique ID does not exist
             return JsonResponse({'error': 'User not found'}, status=404)
-    
+
     else:
         get_data = AppUser.objects.filter(is_superuser=False)
         context = {'user_data': get_data}
@@ -166,7 +168,7 @@ def train_system(dataset_path):
             folder_parts = person_folder.split('_')
             if len(folder_parts) == 3:
                 person_id, first_name, last_name = folder_parts[0], folder_parts[1], folder_parts[2]
-                
+
                 person_name = f"{first_name} {last_name}"
 
             for image_file in os.listdir(person_path):
@@ -180,7 +182,7 @@ def train_system(dataset_path):
 
                 # Get the face encoding
                 face_encoding = face_recognition.face_encodings(image)
-                
+
                 if len(face_encoding) > 0:
                     # Store the face encoding and the corresponding person's name
                     known_face_encodings.append(face_encoding[0])
@@ -208,46 +210,56 @@ def TrainOnDataView(request):
         context = {'Message':'Training completed on the active Dataset'}
         return render(request, 'core/train_data.html', context)
     return render(request, 'core/train_data.html', context)
-   
+
 
 @csrf_exempt
 @login_required(login_url="AccountApp:custom_login")
 def DetectPersonView(request):
+    context = {'message': None}
+
     if request.method == 'POST' and 'image_data' in request.POST:
-            try:
-                timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-                
-                capture_image_folder = "detect_image"
-                image_recognize_path = os.path.join(settings.BASE_DIR, capture_image_folder)
-                if not os.path.exists(image_recognize_path):
-                    os.makedirs(image_recognize_path)
-                
-                # Create the file name with the timestamp
-                file_name = f"_{timestamp}.png"
+        try:
+            timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+            capture_image_folder = "detect_image"
+            image_recognize_path = os.path.join(settings.BASE_DIR, capture_image_folder)
 
-                # Process the captured image data
-                image_data = request.POST['image_data'].split(',')[1]
-                image_content = ContentFile(base64.b64decode(image_data), name=file_name)        
-                
-                # Create the full image path
-                image_path = os.path.join(image_recognize_path, file_name)
+            if not os.path.exists(image_recognize_path):
+                os.makedirs(image_recognize_path)
 
-                # Save the image file to the specified path
-                print(image_path)
-                with open(image_path, 'wb') as img_file:
-                    img_file.write(image_content.read())
+            # Create the file name with the timestamp
+            file_name = f"_{timestamp}.png"
 
-                print("Recognizing")
+            # Process the captured image data
+            image_data = request.POST['image_data'].split(',')[1]
+            image_content = ContentFile(base64.b64decode(image_data), name=file_name)
 
-                recognize_faces(image_path)
+            # Create the full image path
+            image_path = os.path.join(image_recognize_path, file_name)
 
-                # Delete Image after recognition
-                os.remove(image_path)
-            
-            except Exception as e:
-                print(e)
-            
-    context = {}
+            # Save the image file to the specified path
+            with open(image_path, 'wb') as img_file:
+                img_file.write(image_content.read())
+
+            print("Recognizing")
+
+            recognize_faces(image_path)
+
+            # Delete Image after recognition
+            os.remove(image_path)
+
+            context['message'] = 'Attendance marked successfully!'
+            messages.success(request, context['message'])
+
+            # Redirect to the same view after successful form submission
+            return redirect('core:ViewDetectPerson')
+
+        except Exception as e:
+            context['message'] = 'Error while marking attendance.'
+            print(e)
+
+            messages.error(request, context['message'])
+            return redirect('core:ViewDetectPerson')
+
     return render(request, 'core/detect_person.html', context)
 
 def recognize_faces(image_path):
@@ -283,7 +295,7 @@ def recognize_faces(image_path):
 
         print(f"Person ID: {person_id}, Person Name: {person_name}, Location: {top},{right},{bottom},{left}")
         Mark_Attendance(person_id)
-        
+
 def Mark_Attendance(unique_ID):
     # Retrieve the user
     user = AppUser.objects.get(custom_unique_id=unique_ID)
@@ -302,20 +314,32 @@ def Mark_Attendance(unique_ID):
 @login_required(login_url="AccountApp:custom_login")
 def AttendenceSearchView(request):
     get_deptt_name = Department.objects.all()
-    users_in_department = None  # Initialize the variable
+    users_in_department = AppUser.objects.all()
 
-    if request.method == 'POST':
-        select_deptt_name = request.POST.get('search_field')
+    # Retrieve search parameter from the URL
+    select_deptt_name = request.GET.get('search_field')
+    if select_deptt_name:
         get_deptt_object = Department.objects.get(id=select_deptt_name)
         users_in_department = AppUser.objects.filter(department=get_deptt_object)
-    
+
+    # Add pagination
+    paginator = Paginator(users_in_department, 10)  # Show 10 users per page
+
+    page = request.GET.get('page')
+    try:
+        users_in_department = paginator.page(page)
+    except PageNotAnInteger:
+        users_in_department = paginator.page(1)
+    except EmptyPage:
+        users_in_department = paginator.page(paginator.num_pages)
+
     context = {'Department_Names': get_deptt_name, 'Users_Info': users_in_department}
     return render(request, 'core/attendence_search.html', context)
 
 @login_required(login_url="AccountApp:custom_login")
 def AttendenceRecordView(request, pk):
     get_user = get_object_or_404(AppUser, custom_unique_id=pk)
-    get_attendance_record = Attendance.objects.filter(user=get_user)
+    get_attendance_record = Attendance.objects.filter(user=get_user).order_by('-date', '-time')
 
     # Check if export button is clicked
     if 'export' in request.GET:
@@ -347,5 +371,16 @@ def AttendenceRecordView(request, pk):
 
         return response
 
-    context = {'Attendance_Record': get_attendance_record, 'User': get_user}
+     # Add pagination
+    paginator = Paginator(get_attendance_record, 10)  # Show 10 records per page
+
+    page = request.GET.get('page')
+    try:
+        attendance_records = paginator.page(page)
+    except PageNotAnInteger:
+        attendance_records = paginator.page(1)
+    except EmptyPage:
+        attendance_records = paginator.page(paginator.num_pages)
+
+    context = {'Attendance_Record': attendance_records, 'User': get_user}
     return render(request, 'core/person_record.html', context)

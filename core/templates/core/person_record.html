@@ -44,6 +44,23 @@
                         {% endfor %}
                     </tbody>
                 </table>
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if Attendance_Record.has_previous %}
+                            <a href="?page=1">&laquo; first</a>
+                            <a href="?page={{ Attendance_Record.previous_page_number }}">previous</a>
+                        {% endif %}
+
+                        <span class="current">
+                            Page {{ Attendance_Record.number }} of {{ Attendance_Record.paginator.num_pages }}.
+                        </span>
+
+                        {% if Attendance_Record.has_next %}
+                            <a href="?page={{ Attendance_Record.next_page_number }}">next</a>
+                            <a href="?page={{ Attendance_Record.paginator.num_pages }}">last &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
             </div>
         </div>
     </div>

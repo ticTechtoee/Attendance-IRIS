@@ -12,9 +12,20 @@
 
 <body>
     <div class="wrapper">
+
         {% include "core/sidebar.html" %}
         <div class="full_reg_form">
             <div class="reg_form">
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+
                 <form action="" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     </div>

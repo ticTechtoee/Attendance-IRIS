@@ -72,7 +72,7 @@ WSGI_APPLICATION = 'django_fras.wsgi.application'
 """DATABASES = {
     'default': {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'fypdb',  
+    'NAME': 'fypdb',
     'HOST': 'localhost',
     'PORT': '3306',
     'USER': 'root',
