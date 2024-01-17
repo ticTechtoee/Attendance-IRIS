@@ -7,6 +7,8 @@ from core.models import ApplicationName,ApplicationType,Department
 from django.contrib.auth.decorators import user_passes_test, login_required
 import os
 
+from django.db import IntegrityError
+
 AppUser = get_user_model()
 
 def is_admin(user):
@@ -25,6 +27,8 @@ def RegisterPersonView(request):
     # Retrieve the role of the logged-in user from the session
     user_role = request.session.get('user_role', 'student')
 
+    error_message = None  # Initialize error_message variable
+
     if request.method == 'POST':
         u_id = request.POST.get('Unique_ID')
         user_name = request.POST.get('username')
@@ -35,40 +39,45 @@ def RegisterPersonView(request):
         confirm_password = request.POST.get('confirm_password')
         deptt = request.POST.get('department')
 
-        # Ensure passwords match
-        if password != confirm_password:
-            # Handle the case where passwords do not match
-            return render(request, "core/student.html", {'dept_names': get_dept_name, 'app_type': get_application_type, 'user_role': user_role, 'error_message': 'Passwords do not match'})
+        try:
+            # Ensure passwords match
+            if password != confirm_password:
+                # Handle the case where passwords do not match
+                raise ValueError('Passwords do not match')
 
-        # Hash the password
-        hashed_password = make_password(password)
+            # Hash the password
+            hashed_password = make_password(password)
 
-        # Get the department
-        get_deptt = Department.objects.get(id=deptt)
+            # Get the department
+            get_deptt = Department.objects.get(id=deptt)
 
-        # Create the user with the appropriate role
-        user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
-                       email=email, department=get_deptt, password=hashed_password)
+            # Create the user with the appropriate role
+            user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
+                           email=email, department=get_deptt, password=hashed_password)
 
-        if user_role == 'teacher':
-            user.is_teacher = True
-        elif user_role == 'superuser':
-            user.is_superuser = True
+            if user_role == 'teacher':
+                user.is_teacher = True
+            elif user_role == 'superuser':
+                user.is_superuser = True
 
-        user.save()
+            user.save()
 
-        if user:
-            # Create a folder in the media directory using the unique ID, first name, and last name
-            folder_name = f"{u_id}_{first_name}_{last_name}"
-            media_folder_path = os.path.join("media/dataset/", folder_name)
+            if user:
+                # Create a folder in the media directory using the unique ID, first name, and last name
+                folder_name = f"{u_id}_{first_name}_{last_name}"
+                media_folder_path = os.path.join("media/dataset/", folder_name)
 
-            # Check if the folder already exists, and create it if not
-            if not os.path.exists(media_folder_path):
-                os.makedirs(media_folder_path)
+                # Check if the folder already exists, and create it if not
+                if not os.path.exists(media_folder_path):
+                    os.makedirs(media_folder_path)
 
-        return redirect('core:ViewCaptureImage')
+            return redirect('core:ViewCaptureImage')
 
-    context = {'dept_names': get_dept_name, 'app_type': get_application_type, 'user_role': user_role}
+        except IntegrityError:
+            # Handle the case where a user with the same email already exists
+            error_message = 'User with this email already exists'
+
+    context = {'dept_names': get_dept_name, 'app_type': get_application_type, 'user_role': user_role, 'error_message': error_message}
     return render(request, "core/student.html", context)
 
 def user_login(request):

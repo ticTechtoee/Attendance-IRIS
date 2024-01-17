@@ -13,6 +13,9 @@ class AppUser(AbstractUser):
     # New field for teacher status
     is_teacher = models.BooleanField(default=False)
 
+    # Ensure unique email addresses
+    email = models.EmailField(unique=True)
+
     def save(self, *args, **kwargs):
         # Check if the user has an application type selected
         if self.application_type and self.application_type.type_app == 'OTHER':
@@ -24,7 +27,6 @@ class AppUser(AbstractUser):
 
     def __str__(self):
         return self.email
-
 class Attendance(models.Model):
     user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
     date = models.DateField()
