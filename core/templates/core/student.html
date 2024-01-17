@@ -71,6 +71,24 @@
                                 </select>
                             </td>
                         </tr>
+
+                        <tr>
+                            <th>Role</th>
+                            <td>
+                                <select name="role" id="role" class="input form-control" placeholder="Role" required>
+                                    <option value="" disabled selected>Role</option>
+                                    {% if user_role == 'superuser' %}
+                                        <option value="superuser">Admin</option>
+                                        <option value="teacher">Teacher</option>
+
+                                    {% elif user_role == 'teacher' %}
+
+                                        <option value="teacher">Teacher</option>
+                                        <option value="student">Other Employee</option>
+                                    {% endif %}
+                                </select>
+                            </td>
+                        </tr>
                         {% if app_type.type_app == "OTHER" %}
                         {% else %}
                         <tr>
@@ -79,7 +97,7 @@
                                 <select name="program" id="program" class="input" class="form-control"
                                     placeholder="Student Program" required>
                                     <option value="" disabled selected>Student Program</option>
-                                    
+
 
 
                                 </select>
@@ -91,7 +109,7 @@
                                 <select name="semester" id="semester" class="input" class="form-control"
                                     placeholder="Semester" required>
                                     <option value="" disabled selected>Select Semester</option>
-                                    
+
                                 </select>
                             </td>
                         </tr>

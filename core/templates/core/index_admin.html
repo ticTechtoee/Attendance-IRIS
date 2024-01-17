@@ -3,7 +3,7 @@
 
 <html lang="en">
 <head>
-	<title>IRIS Attendece System</title>
+	<title>IRIS Attendance System</title>
   <link href="{% static 'CSS/index-style.css' %}" rel="stylesheet" type="text/css">
   <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
 	<link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="wrapper">
-    {% include "core/sidebar.html" %}
+    {% include "core/sidebar_admin.html" %}
     <div class="main_content">
       {% csrf_token %}
         <div class="row">
@@ -25,14 +25,14 @@
           <div class="column" style="background-color: #15A085;">
             <div class="card" style="background-color: #15A085;">
               <a href="{% url 'AccountApp:ViewRegisterPerson' %}"><img src ={% static '/Images/online-registration_icon.png' %}/></a>
-              <p>Register Person</p>
+              <p>Register Employee</p>
             </div>
           </div>
 
           <div class="column" style="background-color: #F39C13;">
             <div class="card" style="background-color: #F39C13;">
               <a href="{% url 'core:ViewAttendenceSearch' %}"><img src ={% static '/Images/search_icon.png' %}/></a>
-              <p>Search</p>
+              <p>Search & Update</p>
             </div>
           </div>
 
@@ -43,12 +43,12 @@
             </div>
           </div>
 
-          <div class="column" style="background-color: #8E44AD;">
+          <!-- <div class="column" style="background-color: #8E44AD;">
             <div class="card" style="background-color: #8E44AD;">
               <a href="{% url 'core:ViewDetectPerson' %}"><img src ={% static '/Images/help_icon.png' %}/></a>
               <p>Mark Attendece</p>
             </div>
-          </div>
+          </div> -->
 
           <div class="column" style="background-color: #E74C3D;">
             <div class="card" style="background-color: #E74C3D;">

@@ -8,8 +8,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from .models import ApplicationName,ApplicationType,Department
 from django.http import HttpResponse
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth import get_user_model
+
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -39,55 +38,7 @@ def IndexPageView(request):
     context = {'Set_Logo': set_logo}
     return render(request, 'core/index.html', context)
 
-@user_passes_test(is_admin, login_url="AccountApp:custom_login")
-def RegisterPersonView(request):
-    get_dept_name = Department.objects.all()
-    try:
-        # Assuming there's only one record in the ApplicationType model
-        get_application_type = ApplicationType.objects.get()
-    except ApplicationType.DoesNotExist:
-        # Handle the case where no record is found
-        get_application_type = None
 
-    if request.method == 'POST':
-        u_id = request.POST.get('Unique_ID')
-        user_name = request.POST.get('username')
-        first_name = request.POST.get('fname')
-        last_name = request.POST.get('lname')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-        deptt = request.POST.get('department')
-
-        # Ensure passwords match
-        if password != confirm_password:
-            # Handle the case where passwords do not match
-            return render(request, "core/student.html", {'dept_names': get_dept_name, 'app_type': get_application_type, 'error_message': 'Passwords do not match'})
-
-        # Hash the password
-        hashed_password = make_password(password)
-
-        # Get the department
-        get_deptt = Department.objects.get(id=deptt)
-
-        # Create the user
-        user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
-                       email=email, department=get_deptt, password=hashed_password)
-        user.save()
-
-        if user:
-            # Create a folder in the media directory using the unique ID, first name, and last name
-            folder_name = f"{u_id}_{first_name}_{last_name}"
-            media_folder_path = os.path.join("media/dataset/", folder_name)
-
-            # Check if the folder already exists, and create it if not
-            if not os.path.exists(media_folder_path):
-                os.makedirs(media_folder_path)
-
-        return redirect('core:ViewCaptureImage')
-
-    context = {'dept_names': get_dept_name, 'app_type': get_application_type}
-    return render(request, "core/student.html", context)
 
 
 def add_padding(data):
@@ -384,3 +335,12 @@ def AttendenceRecordView(request, pk):
 
     context = {'Attendance_Record': attendance_records, 'User': get_user}
     return render(request, 'core/person_record.html', context)
+
+
+def AttendenceMarkedMessageView(request):
+    context = {}
+    return render(request, 'core/message_attendance_marked.html', context)
+
+def IndexAdminPageView(request):
+    context = {}
+    return render(request, 'core/index_admin.html', context)
