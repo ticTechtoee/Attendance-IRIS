@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from core.models import Department, Program, Semester, ApplicationType
+from django.utils import timezone
 
 class AppUser(AbstractUser):
     custom_unique_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
@@ -27,14 +28,25 @@ class AppUser(AbstractUser):
 
     def __str__(self):
         return self.email
+
+
 class Attendance(models.Model):
     user = models.ForeignKey(AppUser, on_delete=models.CASCADE)
     date = models.DateField()
-    time = models.TimeField()
-    is_present = models.BooleanField(default=False)
+    entry_time = models.TimeField(null=True, blank=True)
+    exit_time = models.TimeField(null=True, blank=True)
 
     class Meta:
-        unique_together = ['user', 'date', 'time']
+        unique_together = ['user', 'date']
 
     def __str__(self):
-        return f"{self.user} - {self.date} {self.time}"
+        return f"{self.user} - {self.date} Entry: {self.entry_time} Exit: {self.exit_time}"
+
+    def calculate_hours_worked(self):
+        if self.entry_time and self.exit_time:
+            entry_datetime = timezone.datetime.combine(self.date, self.entry_time)
+            exit_datetime = timezone.datetime.combine(self.date, self.exit_time)
+            duration = exit_datetime - entry_datetime
+            return duration.total_seconds() / 3600  # Convert seconds to hours
+        else:
+            return 0

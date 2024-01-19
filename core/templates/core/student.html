@@ -95,23 +95,24 @@
                         {% if app_type.type_app == "OTHER" %}
                         {% else %}
                         <tr>
-                            <th>Student Program</th>
+                            <th>Program</th>
                             <td>
-                                <select name="program" id="program" class="input" class="form-control"
-                                    placeholder="Student Program" required>
-                                    <option value="" disabled selected>Student Program</option>
-
-
-
+                                <select name="program" id="role" class="input form-control" placeholder="Program">
+                                    <option value="" disabled selected>Program</option>
+                                    {% for data in Student_Program %}
+                                        <option value="{{data.id}}">{{data.program_name}}</option>
+                                    {% endfor %}
                                 </select>
                             </td>
                         </tr>
                         <tr>
-                            <th>Student Semester</th>
+                            <th>Semester</th>
                             <td>
-                                <select name="semester" id="semester" class="input" class="form-control"
-                                    placeholder="Semester" required>
-                                    <option value="" disabled selected>Select Semester</option>
+                                <select name="semester" id="role" class="input form-control" placeholder="Program">
+                                    <option value="" disabled selected>Semester</option>
+                                    {% for data in Student_Semester %}
+                                        <option value="{{data.id}}">{{data.semester_name}}</option>
+                                        {% endfor %}
 
                                 </select>
                             </td>

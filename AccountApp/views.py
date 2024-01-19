@@ -3,7 +3,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
-from core.models import ApplicationName,ApplicationType,Department
+from core.models import ApplicationName,ApplicationType,Department, Semester, Program
 from django.contrib.auth.decorators import user_passes_test, login_required
 import os
 
@@ -16,7 +16,11 @@ def is_admin(user):
 
 # @user_passes_test(is_admin, login_url="AccountApp:custom_login")
 def RegisterPersonView(request):
+    current_user = request.user
+    print(current_user.is_teacher)
     get_dept_name = Department.objects.all()
+    get_student_program =Program.objects.all()
+    get_student_semester = Semester.objects.all()
     try:
         # Assuming there's only one record in the ApplicationType model
         get_application_type = ApplicationType.objects.get()
@@ -25,7 +29,6 @@ def RegisterPersonView(request):
         get_application_type = None
 
     # Retrieve the role of the logged-in user from the session
-    user_role = request.session.get('user_role', 'student')
 
     error_message = None  # Initialize error_message variable
 
@@ -38,6 +41,7 @@ def RegisterPersonView(request):
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
         deptt = request.POST.get('department')
+        user_role = request.POST.get('role')
 
         try:
             # Ensure passwords match
@@ -50,10 +54,17 @@ def RegisterPersonView(request):
 
             # Get the department
             get_deptt = Department.objects.get(id=deptt)
-
-            # Create the user with the appropriate role
-            user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
-                           email=email, department=get_deptt, password=hashed_password)
+            if get_application_type.type_app == "OTHER":
+                # Create the user with the appropriate role
+                user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
+                            email=email, department=get_deptt, password=hashed_password)
+            elif get_application_type.type_app == "EDU":
+                program_id = request.POST.get('program')
+                program_instance = Program.objects.get(id=program_id)
+                semester_id = request.POST.get('semester')
+                semester_instance = Semester.objects.get(id=semester_id)
+                user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
+                            email=email, department=get_deptt, password=hashed_password,program = program_instance,semester=semester_instance)
 
             if user_role == 'teacher':
                 user.is_teacher = True
@@ -77,7 +88,14 @@ def RegisterPersonView(request):
             # Handle the case where a user with the same email already exists
             error_message = 'User with this email already exists'
 
-    context = {'dept_names': get_dept_name, 'app_type': get_application_type, 'user_role': user_role, 'error_message': error_message}
+    if current_user.is_superuser:
+        user_role = "superuser"
+    elif current_user.is_superuser:
+        user_role = "teacher"
+    else:
+        user_role = None
+
+    context = {'dept_names': get_dept_name, 'app_type': get_application_type, 'Student_Program':get_student_program, 'Student_Semester':get_student_semester, 'user_role': user_role, 'error_message': error_message}
     return render(request, "core/student.html", context)
 
 def user_login(request):

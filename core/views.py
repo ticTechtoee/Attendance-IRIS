@@ -11,6 +11,8 @@ from django.http import HttpResponse
 
 from django.contrib.auth.decorators import user_passes_test, login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.utils import timezone
+from django.db import transaction
 
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
@@ -28,7 +30,12 @@ def is_admin(user):
 
 
 def SetProjectNameView(request):
-    set_name =  ApplicationName.objects.latest('id')
+
+    try:
+        set_name =  ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_name = "No Name"
+
     context = {'Name_of_Project': set_name}
     return render(request, 'core/welcome.html', context)
 
@@ -105,6 +112,7 @@ def capture_image(request):
 
     else:
         get_data = AppUser.objects.filter(is_superuser=False)
+        print(get_data)
         context = {'user_data': get_data}
         return render(request, 'core/capture_image.html', context)
 
@@ -249,18 +257,34 @@ def recognize_faces(image_path):
 
 def Mark_Attendance(unique_ID):
     # Retrieve the user
-    user = AppUser.objects.get(custom_unique_id=unique_ID)
+    user = get_object_or_404(AppUser, custom_unique_id=unique_ID)
 
     # Get the current date and time
-    current_date = datetime.now().date()
-    current_time = datetime.now().time()
+    current_datetime = timezone.now()
+    current_date = current_datetime.date()
+    current_time = current_datetime.time()
 
-    # Create or update the attendance record
-    attendance, created = Attendance.objects.get_or_create(user=user, date=current_date, time=current_time)
-    attendance.is_present = True
-    attendance.save()
+    with transaction.atomic():
+        # Check if the user has already marked attendance for the current date
+        existing_attendance = Attendance.objects.filter(user=user, date=current_date).first()
 
-    return HttpResponse("Attendance Marked")
+        if existing_attendance:
+            # If attendance record exists, check if it's an entry or exit
+            if existing_attendance.entry_time and not existing_attendance.exit_time:
+                # Update the existing record for exit
+                existing_attendance.exit_time = current_time
+                existing_attendance.save()
+                return HttpResponse("Exit time marked.")
+            else:
+                # Create a new attendance record for entry
+                new_attendance = Attendance(user=user, date=current_date, entry_time=current_time)
+                new_attendance.save()
+                return HttpResponse("Entry time marked.")
+        else:
+            # Create a new attendance record for entry
+            new_attendance = Attendance(user=user, date=current_date, entry_time=current_time)
+            new_attendance.save()
+            return HttpResponse("Entry time marked.")
 
 @login_required(login_url="AccountApp:custom_login")
 def AttendenceSearchView(request):

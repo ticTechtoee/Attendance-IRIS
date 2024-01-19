@@ -19,7 +19,7 @@
                     {% csrf_token %}
                     <table style="width: 100%;">
                         <caption>Registration form | 2</caption>
-                        
+
                             <tr>
                                 <th>Select Unique ID</th>
                                 <td>
@@ -29,12 +29,12 @@
                                         {% for user in user_data %}
                                         <option value="{{user.custom_unique_id}}">{{user.custom_unique_id}}</option>
                                         {% endfor %}
-    
+
                                     </select>
                                 </td>
                             </tr>
-                                                  
-                        
+
+
                     </table>
             </div>
             <div class="cam">
