@@ -17,7 +17,7 @@ def is_admin(user):
 # @user_passes_test(is_admin, login_url="AccountApp:custom_login")
 def RegisterPersonView(request):
     current_user = request.user
-    print(current_user.is_teacher)
+
     get_dept_name = Department.objects.all()
     get_student_program =Program.objects.all()
     get_student_semester = Semester.objects.all()
@@ -90,7 +90,7 @@ def RegisterPersonView(request):
 
     if current_user.is_superuser:
         user_role = "superuser"
-    elif current_user.is_superuser:
+    elif current_user.is_teacher:
         user_role = "teacher"
     else:
         user_role = None
