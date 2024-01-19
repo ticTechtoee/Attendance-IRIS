@@ -19,7 +19,7 @@ def RegisterPersonView(request):
     current_user = request.user
 
     get_dept_name = Department.objects.all()
-    get_student_program =Program.objects.all()
+    get_student_program = Program.objects.all()
     get_student_semester = Semester.objects.all()
     try:
         # Assuming there's only one record in the ApplicationType model
@@ -30,7 +30,7 @@ def RegisterPersonView(request):
 
     # Retrieve the role of the logged-in user from the session
 
-    error_message = None  # Initialize error_message variable
+    error_messages = []  # Initialize error_messages list
 
     if request.method == 'POST':
         u_id = request.POST.get('Unique_ID')
@@ -47,7 +47,7 @@ def RegisterPersonView(request):
             # Ensure passwords match
             if password != confirm_password:
                 # Handle the case where passwords do not match
-                raise ValueError('Passwords do not match')
+                error_messages.append('Passwords do not match')
 
             # Hash the password
             hashed_password = make_password(password)
@@ -57,14 +57,15 @@ def RegisterPersonView(request):
             if get_application_type.type_app == "OTHER":
                 # Create the user with the appropriate role
                 user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
-                            email=email, department=get_deptt, password=hashed_password)
+                               email=email, department=get_deptt, password=hashed_password)
             elif get_application_type.type_app == "EDU":
                 program_id = request.POST.get('program')
                 program_instance = Program.objects.get(id=program_id)
                 semester_id = request.POST.get('semester')
                 semester_instance = Semester.objects.get(id=semester_id)
                 user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
-                            email=email, department=get_deptt, password=hashed_password,program = program_instance,semester=semester_instance)
+                               email=email, department=get_deptt, password=hashed_password,
+                               program=program_instance, semester=semester_instance)
 
             if user_role == 'teacher':
                 user.is_teacher = True
@@ -86,7 +87,7 @@ def RegisterPersonView(request):
 
         except IntegrityError:
             # Handle the case where a user with the same email already exists
-            error_message = 'User with this email already exists'
+            error_messages.append('User with this email already exists')
 
     if current_user.is_superuser:
         user_role = "superuser"
@@ -95,8 +96,11 @@ def RegisterPersonView(request):
     else:
         user_role = None
 
-    context = {'dept_names': get_dept_name, 'app_type': get_application_type, 'Student_Program':get_student_program, 'Student_Semester':get_student_semester, 'user_role': user_role, 'error_message': error_message}
+    context = {'dept_names': get_dept_name, 'app_type': get_application_type,
+               'Student_Program': get_student_program, 'Student_Semester': get_student_semester,
+               'user_role': user_role, 'error_messages': error_messages}
     return render(request, "core/student.html", context)
+
 
 def user_login(request):
     if request.method == 'POST':

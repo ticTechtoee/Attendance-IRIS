@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'core',
     'PayrollApp.apps.PayrollappConfig',
     #'users',
-    'django_summernote',
+    #'django_summernote',
 
 ]
 

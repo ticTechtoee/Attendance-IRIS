@@ -10,11 +10,7 @@ class AppUser(AbstractUser):
     semester = models.ForeignKey(Semester, null=True, blank=True, on_delete=models.DO_NOTHING)
     application_type = models.ForeignKey(ApplicationType, null=True, blank=True, on_delete=models.DO_NOTHING)
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-    # New field for teacher status
     is_teacher = models.BooleanField(default=False)
-
-    # Ensure unique email addresses
     email = models.EmailField(unique=True)
 
     def save(self, *args, **kwargs):

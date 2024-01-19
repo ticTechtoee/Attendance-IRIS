@@ -15,8 +15,12 @@
         {% include "core/sidebar.html" %}
         <div class="full_reg_form">
             <div class="reg_form">
-                {% if error_message %}
-                    <p class="error-message">{{ error_message }}</p>
+                {% if error_messages %}
+    <ul class="error-messages">
+                {% for message in error_messages %}
+            <li class="error-message">{{ message }}</li>
+                {% endfor %}
+                </ul>
                 {% endif %}
                 <form action="" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
