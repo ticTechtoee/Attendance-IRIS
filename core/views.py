@@ -326,15 +326,32 @@ def IndexAdminPageView(request):
     return render(request, 'core/index_admin.html', context)
 
 def calculate_hours_per_month(request):
-    # Get the logged-in user's attendance
-    user_attendance = Attendance.objects.filter(user=request.user)
+     # Get the current month and year
+    current_month = timezone.now().month
+    current_year = timezone.now().year
 
-    # Calculate hours worked for each attendance record
+    # Get the logged-in user's attendance for the current month
+    user_attendance = Attendance.objects.filter(
+        user=request.user,
+        date__month=current_month,
+        date__year=current_year
+    )
+
+    total_seconds = 0
+
     for attendance in user_attendance:
         attendance.hours_worked = attendance.calculate_hours_worked()
+        total_seconds += attendance.hours_worked[0] * 3600 + attendance.hours_worked[1] * 60 + attendance.hours_worked[2]
+
+    total_hours = total_seconds // 3600
+    total_minutes = (total_seconds % 3600) // 60
+    total_seconds_remainder = total_seconds % 60
+
+    average_hour = (total_hours + total_minutes / 60 + total_seconds_remainder / 3600) / 240
 
     context = {
         'user_attendance': user_attendance,
+        'total_hours': average_hour,
     }
 
     return render(request, 'core/hours_calculation.html', context)
