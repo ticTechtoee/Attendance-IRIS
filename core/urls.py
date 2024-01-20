@@ -18,8 +18,9 @@ urlpatterns = [
     path('attendance_success/', views.AttendanceSuccessView, name="ViewAttendanceSuccess"),
     path('attendance_fail/', views.AttendanceFailedView, name="ViewAttendanceFailed"),
 
-    path('msg_attendance_marked/', views.AttendenceMarkedMessageView, name="ViewAttendenceMarkedMessage"),
 
-    path('hours_per_month/', views.calculate_hours_per_month, name='ViewHoursPerMonth')
+
+    path('hours_per_month/', views.calculate_hours_per_month, name='ViewHoursPerMonth'),
+    path('admin_hours_per_month/', views.AdminAverageCalView, name='ViewAdminAverageCal'),
 
 ]

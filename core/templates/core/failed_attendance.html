@@ -1,1 +1,46 @@
-<h2>Attendance Marking Failed</h2>
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+
+<head>
+    <title>Message Page | Fail</title>
+    <link href="{% static 'CSS/student_reg.css' %}" rel="stylesheet" type="text/css">
+    <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+</head>
+
+<body>
+    <div class="wrapper">
+
+        {% include "core/sidebar.html" %}
+        <div class="full_reg_form">
+            <div class="reg_form">
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+
+
+                    {% csrf_token %}
+                    </div>
+            <div class="cam">
+                <h3>Attendance Marking Failed</h3>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+</body>
+
+</html>

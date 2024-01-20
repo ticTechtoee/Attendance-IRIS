@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+
+<head>
+    <title>Search</title>
+    <link href="{% static 'CSS/teacher_reg.css' %}" rel="stylesheet" type="text/css">
+    <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- Include xlsx.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        {% include "core/sidebar.html" %}
+        <div class="full_reg_form d-flex flex-column">
+            <div class="table-responsive">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="text" placeholder="Enter Unique ID" name="user_custom_id">
+                    <input type="submit" class="btn btn-success mb-3" value="Search">
+                    <input type="button" name="export" value="Export to Excel" class="btn btn-primary mb-3" onclick="exportToExcel()">
+                </form>
+                <table class="table" id="attendanceTable">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Entry</th>
+                            <th scope="col">Exit</th>
+                            <th scope="col">Total Working Time</th>
+
+                        </tr>
+                    </thead>
+                    {% if user_attendance %}
+                    <tbody>
+                        {% for attendance in user_attendance %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ attendance.date }}</td>
+                            <td>{{ attendance.entry_time }}</td>
+                            <td>{{ attendance.exit_time }}</td>
+                            <td>{{ attendance.hours_worked.0 }}h {{ attendance.hours_worked.1 }}m {{ attendance.hours_worked.2 }}s</td>
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="5">Average Hours: {{ total_hours }}</td>
+                        </tr>
+                    </tbody>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+    <script>
+        function exportToExcel() {
+            /* Fetch data from the table */
+            var table = document.getElementById("attendanceTable");
+            var sheet = XLSX.utils.table_to_sheet(table);
+
+            /* Create a new workbook */
+            var workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, sheet, "Attendance");
+
+            /* Save the workbook as an Excel file */
+            XLSX.writeFile(workbook, "attendance_data.xlsx");
+        }
+    </script>
+</body>
+
+</html>

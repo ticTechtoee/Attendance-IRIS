@@ -5,7 +5,7 @@
 <ul>
     <li><h4><i class="fas"></i>Admin</h4></li>
 </ul>
-{% else %}
+{% elif user_info.is_teacher %}
 <ul>
     <li><h4><i class="fas"></i>Teacher</h4></li>
 </ul>
@@ -15,10 +15,18 @@
         <li><a href="{% url 'core:index' %}"><i class="fas fa-home"></i>Home</a></li>
         <li><a href="{% url 'AccountApp:ViewRegisterPerson' %}"><i class="fas fa-user"></i>Register Person</a></li>
         <li><a href="{% url 'core:ViewAttendenceSearch' %}"><i class="fas fa-search"></i>Search</a></li>
+        {% if user_info.is_teacher == True %}
+        {% else %}
         <li><a href="{% url 'core:ViewTrainData' %}"><i class="fas fa-user"></i>Train Model</a></li>
+        {% endif %}
         {% if user_info.is_superuser == True %}
         {% else %}
         <li><a href="{% url 'core:ViewDetectPerson' %}"><i class="fas fa-question-circle"></i>Mark Attendance</a></li>
+        {% endif %}
+        {% if user_info.is_teacher == True %}
+        <li><a href="{% url 'core:ViewHoursPerMonth' %}"><i class="fas fa-question-circle"></i>View Your Average</a></li>
+        {% elif user_info.is_superuser == True %}
+        <li><a href="{% url 'core:ViewAdminAverageCal' %}"><i class="fas fa-question-circle"></i>Search Average</a></li>
         {% endif %}
         <li><a href="{% url 'AccountApp:ViewLogout' %}"><i class="fas fa-sign-out"></i>Logout</a></li>
     </ul>

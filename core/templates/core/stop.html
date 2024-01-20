@@ -1,1 +1,47 @@
-<h2>You Cannot Mark attendance Today</h2>
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+
+<head>
+    <title>Message Page | Stop</title>
+    <link href="{% static 'CSS/student_reg.css' %}" rel="stylesheet" type="text/css">
+    <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+</head>
+
+<body>
+    <div class="wrapper">
+
+        {% include "core/sidebar.html" %}
+        <div class="full_reg_form">
+            <div class="reg_form">
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
+
+
+                    {% csrf_token %}
+                    </div>
+            <div class="cam">
+                <h3>Your entry and exit has been recorded for today.</h3>
+                <p>You Cannot mark Attendance for today.</p>
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+</body>
+
+</html>

@@ -196,6 +196,11 @@ def TrainOnDataView(request):
 @login_required(login_url="AccountApp:custom_login")
 @check_attendance
 def DetectPersonView(request):
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
     context = {'message': None}
 
     if request.method == 'POST' and 'image_data' in request.POST:
@@ -271,15 +276,34 @@ def DetectPersonView(request):
             os.remove(image_path)
             return HttpResponse('Some Error Occurred')
             os.remove(image_path)
+    context = {'user_info':get_user, 'Set_Logo':set_logo}
     return render(request, 'core/detect_person.html', context)
 
 def ViewStopMessage(request):
-    return render(request, 'core/stop.html')
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
+    context = {'user_info':get_user, 'Set_Logo':set_logo}
+    return render(request, 'core/stop.html', context)
 
 def AttendanceSuccessView(request):
-    return render(request, 'core/success_attendance.html')
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
+    context = {'user_info':get_user, 'Set_Logo':set_logo}
+    return render(request, 'core/success_attendance.html', context)
 def AttendanceFailedView(request):
-    return render(request, 'core/failed_attendance.html')
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
+    context = {'user_info':get_user, 'Set_Logo':set_logo}
+    return render(request, 'core/failed_attendance.html', context)
 @login_required(login_url="AccountApp:custom_login")
 def AttendenceSearchView(request):
     get_user = request.user
@@ -345,12 +369,14 @@ def AttendenceRecordView(request, pk):
         attendance_records = paginator.page(paginator.num_pages)
     context = {'Attendance_Record': attendance_records, 'User': get_user}
     return render(request, 'core/person_record.html', context)
-def AttendenceMarkedMessageView(request):
-    context = {}
-    return render(request, 'core/message_attendance_marked.html', context)
+
 
 def calculate_hours_per_month(request):
-     # Get the current month and year
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
     current_month = timezone.now().month
     current_year = timezone.now().year
 
@@ -374,8 +400,50 @@ def calculate_hours_per_month(request):
     average_hour = (total_hours + total_minutes / 60 + total_seconds_remainder / 3600) / 240
 
     context = {
-        'user_attendance': user_attendance,
-        'total_hours': average_hour,
-    }
+            'user_attendance': user_attendance,
+            'total_hours': average_hour,
+            'user_info':get_user, 'Set_Logo':set_logo
+        }
 
     return render(request, 'core/hours_calculation.html', context)
+
+
+def AdminAverageCalView(request):
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
+    context = {'user_info':get_user, 'Set_Logo':set_logo}
+    if request.method ==   'POST':
+        get_user_custom_id = request.POST.get('user_custom_id')
+        # Get the current month and year
+        current_month = timezone.now().month
+        current_year = timezone.now().year
+
+        get_user = AppUser.objects.get(custom_unique_id = get_user_custom_id)
+        user_attendance = Attendance.objects.filter(
+            user=get_user,
+            date__month=current_month,
+            date__year=current_year
+        )
+
+        total_seconds = 0
+
+        for attendance in user_attendance:
+            attendance.hours_worked = attendance.calculate_hours_worked()
+            total_seconds += attendance.hours_worked[0] * 3600 + attendance.hours_worked[1] * 60 + attendance.hours_worked[2]
+
+        total_hours = total_seconds // 3600
+        total_minutes = (total_seconds % 3600) // 60
+        total_seconds_remainder = total_seconds % 60
+
+        average_hour = (total_hours + total_minutes / 60 + total_seconds_remainder / 3600) / 240
+
+        context = {
+            'user_attendance': user_attendance,
+            'total_hours': average_hour,
+            'user_info':get_user, 'Set_Logo':set_logo
+        }
+
+    return render(request, 'core/admin_hours_calculation.html', context)
