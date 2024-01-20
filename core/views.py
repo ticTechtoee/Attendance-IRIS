@@ -1,4 +1,6 @@
 from django.contrib import messages
+from functools import wraps
+
 import face_recognition
 import os
 import base64
@@ -20,8 +22,40 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import pickle
+# Custom Decorators
+
 def is_admin(user):
     return user.is_authenticated and user.is_superuser
+
+def check_attendance(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        # Your custom logic here
+        if request.user.is_authenticated:
+            user = request.user
+            current_date = datetime.now().date()
+
+            try:
+                attendance_instance = Attendance.objects.get(user=user, date=current_date)
+
+                if attendance_instance.entry_time and attendance_instance.exit_time:
+                    # Both entry and exit are present, redirect to 'core:StopMessage'
+                    return redirect('core:StopMessageView')
+
+            except Attendance.DoesNotExist:
+                # Attendance instance not present for the day, allow access to the view
+                return view_func(request, *args, **kwargs)
+
+        # If the user is not authenticated, redirect to a login page
+        else:
+            return redirect('AccountApp:custom_login')  # Replace 'login' with your actual login URL
+
+        # If the control reaches here, it means the user is authenticated but attendance conditions are not met
+        return view_func(request, *args, **kwargs)
+
+    return wrapper
+#----------------------------------------------------------------------------------------------------------
+
 def SetProjectNameView(request):
     try:
         set_name =  ApplicationName.objects.latest('id')
@@ -134,8 +168,8 @@ def TrainOnDataView(request):
 
 @csrf_exempt
 @login_required(login_url="AccountApp:custom_login")
+@check_attendance
 def DetectPersonView(request):
-    attendance_marked = False
     context = {'message': None}
 
     if request.method == 'POST' and 'image_data' in request.POST:
@@ -176,21 +210,44 @@ def DetectPersonView(request):
                     person_info = known_face_names[first_match_index]
                     person_id = person_info['id']
                     person_name = person_info['name']
-                    attendance_marked = True
                     print(f"Person ID: {person_id}, Person Name: {person_name}, Location: {top},{right},{bottom},{left}")
 
-            if attendance_marked:
-                os.remove(image_path)
-                print("Attendance Marked Successfully")
-                return JsonResponse({'success': True})
-            else:
-                print("Attendance Not Marked Successfully")
-                return JsonResponse({'success': False})
+                    # Check if the user has already marked attendance on the same day
+                    user = AppUser.objects.get(custom_unique_id=person_id)
+                    current_date = datetime.now().date()
+
+                    with transaction.atomic():
+                        attendance_instance = Attendance.objects.filter(user=user, date=current_date).first()
+
+                        if attendance_instance:
+                            # User has already marked attendance, consider it as exit attendance
+                            if not attendance_instance.exit_time:
+                                attendance_instance.exit_time = datetime.now().time()
+                                attendance_instance.save()
+                                context['message'] = 'Exit time marked successfully!'
+                            else:
+                                context['message'] = 'Attendance already marked for entry and exit.'
+                        else:
+                            # User is marking attendance for the first time, consider it as entry attendance
+                            new_attendance = Attendance(
+                                user=user,
+                                date=current_date,
+                                entry_time=datetime.now().time(),
+                            )
+                            new_attendance.save()
+                            context['message'] = 'Entry time marked successfully.'
+
+                    print("Attendance Marked Successfully")
+                    os.remove(image_path)
+                    return JsonResponse({'success': True, 'message': context['message']})
         except Exception as e:
+            os.remove(image_path)
             return HttpResponse('Some Error Occurred')
 
     return render(request, 'core/detect_person.html', context)
 
+def ViewStopMessage(request):
+    return render(request, 'core/stop.html')
 
 def AttendanceSuccessView(request):
     return render(request, 'core/success_attendance.html')

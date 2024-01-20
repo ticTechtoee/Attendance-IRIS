@@ -15,6 +15,7 @@ urlpatterns = [
     path('search_attendence/', views.AttendenceSearchView, name="ViewAttendenceSearch"),
     path('person_attendence_record/<str:pk>/', views.AttendenceRecordView, name="ViewAttendenceRecord"),
 
+    path('stop_user/', views.ViewStopMessage, name="StopMessageView"),
     path('attendance_success/', views.AttendanceSuccessView, name="ViewAttendanceSuccess"),
     path('attendance_fail/', views.AttendanceFailedView, name="ViewAttendanceFailed"),
 
