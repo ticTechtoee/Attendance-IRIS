@@ -43,6 +43,11 @@ class Attendance(models.Model):
             entry_datetime = timezone.datetime.combine(self.date, self.entry_time)
             exit_datetime = timezone.datetime.combine(self.date, self.exit_time)
             duration = exit_datetime - entry_datetime
-            return duration.total_seconds() / 3600  # Convert seconds to hours
+
+            # Calculate hours, minutes, and seconds
+            hours, remainder = divmod(duration.total_seconds(), 3600)
+            minutes, seconds = divmod(remainder, 60)
+
+            return int(hours), int(minutes), int(seconds)
         else:
-            return 0
+            return 0, 0, 0

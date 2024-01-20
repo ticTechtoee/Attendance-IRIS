@@ -21,4 +21,6 @@ urlpatterns = [
 
     path('msg_attendance_marked/', views.AttendenceMarkedMessageView, name="ViewAttendenceMarkedMessage"),
 
+    path('hours_per_month/', views.calculate_hours_per_month, name='ViewHoursPerMonth')
+
 ]

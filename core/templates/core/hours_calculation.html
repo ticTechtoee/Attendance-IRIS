@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Attendance</title>
+</head>
+<body>
+    <h1>User Attendance</h1>
+    {% if user_attendance %}
+    <ul>
+        {% for attendance in user_attendance %}
+            <li>
+                {{ attendance.date }} - Entry: {{ attendance.entry_time }} Exit: {{ attendance.exit_time }}
+                {% if attendance.hours_worked %}
+                    - Hours Worked: {{ attendance.hours_worked.0 }}h {{ attendance.hours_worked.1 }}m {{ attendance.hours_worked.2 }}s
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>No attendance records found for the user.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,5 +1,11 @@
 from django.contrib import messages
 from functools import wraps
+from django.db.models.functions import TruncDate, Coalesce
+from django.db.models import ExpressionWrapper, F
+
+from django.db.models import Sum
+
+from django.db.models.fields import DateTimeField
 
 import face_recognition
 import os
@@ -318,3 +324,17 @@ def AttendenceMarkedMessageView(request):
 def IndexAdminPageView(request):
     context = {}
     return render(request, 'core/index_admin.html', context)
+
+def calculate_hours_per_month(request):
+    # Get the logged-in user's attendance
+    user_attendance = Attendance.objects.filter(user=request.user)
+
+    # Calculate hours worked for each attendance record
+    for attendance in user_attendance:
+        attendance.hours_worked = attendance.calculate_hours_worked()
+
+    context = {
+        'user_attendance': user_attendance,
+    }
+
+    return render(request, 'core/hours_calculation.html', context)
