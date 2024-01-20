@@ -31,6 +31,7 @@ class Attendance(models.Model):
     date = models.DateField()
     entry_time = models.TimeField(null=True, blank=True)
     exit_time = models.TimeField(null=True, blank=True)
+    is_present = models.BooleanField(null=True, blank=True)
 
     class Meta:
         unique_together = ['user', 'date']

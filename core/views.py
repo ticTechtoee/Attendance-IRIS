@@ -71,12 +71,15 @@ def SetProjectNameView(request):
     return render(request, 'core/welcome.html', context)
 @login_required(login_url="AccountApp:custom_login")
 def IndexPageView(request):
+    get_user = request.user
     try:
         set_logo = ApplicationName.objects.latest('id')
     except ApplicationName.DoesNotExist:
         set_logo = None
-    context = {'Set_Logo': set_logo}
+    context = {'Set_Logo': set_logo, 'user_info': get_user}
     return render(request, 'core/index.html', context)
+
+
 def add_padding(data):
     # Ensure that the Base64 data has proper padding
     padding = len(data) % 4
@@ -85,7 +88,14 @@ def add_padding(data):
     return data
 @csrf_exempt
 @user_passes_test(is_admin, login_url="AccountApp:custom_login")
+
 def capture_image(request):
+
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
     if request.method == 'POST' and 'image_data' in request.POST:
         get_id = request.POST.get('user_id')
         try:
@@ -127,9 +137,11 @@ def capture_image(request):
     else:
         get_data = AppUser.objects.filter(is_superuser=False)
         print(get_data)
-        context = {'user_data': get_data}
+        context = {'user_data': get_data, 'user_info':get_user, 'Set_Logo':set_logo}
         return render(request, 'core/capture_image.html', context)
+
 def train_system(dataset_path):
+
     known_face_encodings = []
     known_face_names = []
     for person_folder in os.listdir(dataset_path):
@@ -161,15 +173,23 @@ def train_system(dataset_path):
     with open(os.path.join(dat_file_folder, 'trained_data.dat'), 'wb') as file:
         data = {'encodings': known_face_encodings, 'names': known_face_names}
         pickle.dump(data, file)
+
+
 @user_passes_test(is_admin, login_url="AccountApp:custom_login")
 def TrainOnDataView(request):
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
     context = {}
     if request.method == 'POST':
         datasetfolder_name = "dataset"
         dataset_path = os.path.join(settings.MEDIA_ROOT, datasetfolder_name)
         train_system(dataset_path)
-        context = {'Message':'Training completed on the active Dataset'}
+        context = {'Message':'Training completed on the active Dataset', 'user_info':get_user, 'Set_Logo':set_logo}
         return render(request, 'core/train_data.html', context)
+    context = {'user_info':get_user, 'Set_Logo':set_logo}
     return render(request, 'core/train_data.html', context)
 
 @csrf_exempt
@@ -239,6 +259,7 @@ def DetectPersonView(request):
                                 user=user,
                                 date=current_date,
                                 entry_time=datetime.now().time(),
+                                is_present = True
                             )
                             new_attendance.save()
                             context['message'] = 'Entry time marked successfully.'
@@ -249,7 +270,7 @@ def DetectPersonView(request):
         except Exception as e:
             os.remove(image_path)
             return HttpResponse('Some Error Occurred')
-
+            os.remove(image_path)
     return render(request, 'core/detect_person.html', context)
 
 def ViewStopMessage(request):
@@ -261,8 +282,13 @@ def AttendanceFailedView(request):
     return render(request, 'core/failed_attendance.html')
 @login_required(login_url="AccountApp:custom_login")
 def AttendenceSearchView(request):
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
     get_deptt_name = Department.objects.all()
-    users_in_department = AppUser.objects.all()
+    users_in_department = AppUser.objects.filter(is_superuser=False)
     # Retrieve search parameter from the URL
     select_deptt_name = request.GET.get('search_field')
     if select_deptt_name:
@@ -277,12 +303,13 @@ def AttendenceSearchView(request):
         users_in_department = paginator.page(1)
     except EmptyPage:
         users_in_department = paginator.page(paginator.num_pages)
-    context = {'Department_Names': get_deptt_name, 'Users_Info': users_in_department}
+    context = {'Department_Names': get_deptt_name, 'Users_Info': users_in_department, 'user_info':get_user, 'Set_Logo':set_logo}
     return render(request, 'core/attendence_search.html', context)
+
 @login_required(login_url="AccountApp:custom_login")
 def AttendenceRecordView(request, pk):
     get_user = get_object_or_404(AppUser, custom_unique_id=pk)
-    get_attendance_record = Attendance.objects.filter(user=get_user).order_by('-date', '-time')
+    get_attendance_record = Attendance.objects.filter(user=get_user).order_by('-date', '-entry_time')
     # Check if export button is clicked
     if 'export' in request.GET:
         # Create a workbook and add a worksheet

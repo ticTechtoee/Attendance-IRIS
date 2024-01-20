@@ -42,14 +42,15 @@
               <p>Train Model</p>
             </div>
           </div>
-
+          {% if user_info.is_superuser == True %}
+        {% else %}
           <div class="column" style="background-color: #8E44AD;">
             <div class="card" style="background-color: #8E44AD;">
               <a href="{% url 'core:ViewDetectPerson' %}"><img src ={% static '/Images/help_icon.png' %}/></a>
-              <p>Mark Attendece</p>
+              <p>Mark Attendance</p>
             </div>
           </div>
-
+          {% endif %}
           <div class="column" style="background-color: #E74C3D;">
             <div class="card" style="background-color: #E74C3D;">
               <a href="{% url 'AccountApp:ViewLogout' %}"><img src ={% static '/Images/logout_icon.png' %}/></a>

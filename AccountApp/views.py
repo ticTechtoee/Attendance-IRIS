@@ -17,6 +17,11 @@ def is_admin(user):
 # @user_passes_test(is_admin, login_url="AccountApp:custom_login")
 def RegisterPersonView(request):
     current_user = request.user
+    get_user = request.user
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
 
     get_dept_name = Department.objects.all()
     get_student_program = Program.objects.all()
@@ -98,7 +103,7 @@ def RegisterPersonView(request):
 
     context = {'dept_names': get_dept_name, 'app_type': get_application_type,
                'Student_Program': get_student_program, 'Student_Semester': get_student_semester,
-               'user_role': user_role, 'error_messages': error_messages}
+               'user_role': user_role, 'error_messages': error_messages, 'user_info':get_user, 'Set_Logo':set_logo}
     return render(request, "core/student.html", context)
 
 

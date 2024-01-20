@@ -38,8 +38,8 @@
                             <td>{{User.custom_unique_id}}</td>
                             <td>{{User.username}}</td>
                             <td>{{information.date}}</td>
-                            <td>{{information.time}}</td>
-                            <td>{{information.is_present}}</td>
+                            <td>{{information.entry_time}}</td>
+                            <td>{% if information.is_present %}Present{% else %}Absent{% endif %}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
