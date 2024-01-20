@@ -8,7 +8,6 @@ app_name = "core"
 urlpatterns = [
     path('', views.SetProjectNameView, name = "ViewWelcomePage"),
     path('index/', views.IndexPageView, name="index"),
-    path('index_admin/', views.IndexAdminPageView, name="ViewIndexAdmin"),
     path('capture_image/', views.capture_image, name="ViewCaptureImage"),
     path('model_training/', views.TrainOnDataView, name="ViewTrainData"),
     path('detect_person/', views.DetectPersonView, name="ViewDetectPerson"),

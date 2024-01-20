@@ -348,9 +348,6 @@ def AttendenceRecordView(request, pk):
 def AttendenceMarkedMessageView(request):
     context = {}
     return render(request, 'core/message_attendance_marked.html', context)
-def IndexAdminPageView(request):
-    context = {}
-    return render(request, 'core/index_admin.html', context)
 
 def calculate_hours_per_month(request):
      # Get the current month and year

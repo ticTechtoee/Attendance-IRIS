@@ -122,8 +122,8 @@ def user_login(request):
             # Set user role in the session for access in the template
             request.session['user_role'] = 'superuser' if user.is_superuser else ('teacher' if user.is_teacher else 'student')
 
-            if user.is_superuser:
-                return redirect('core:ViewIndexAdmin')
+            if user.is_superuser or user.is_teacher:
+                return redirect('core:index')
             else:
                 return redirect('core:ViewDetectPerson')
         else:
@@ -135,4 +135,4 @@ def user_login(request):
 
 def logoutView(request):
     logout(request)
-    return redirect('core:Home')
+    return redirect('AccountApp:custom_login')
