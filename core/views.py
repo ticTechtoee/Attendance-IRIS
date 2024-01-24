@@ -371,6 +371,10 @@ def AttendenceRecordView(request, pk):
     return render(request, 'core/person_record.html', context)
 
 def UpdateRecordView(request, pk):
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
     person_record = get_object_or_404(AppUser, id=pk)
     get_department = Department.objects.all()
     get_program = Program.objects.all()
@@ -435,11 +439,23 @@ def UpdateRecordView(request, pk):
 
     context = {'Record': person_record, 'dept_names': get_department, 'user_role': user_role,
                'loggedin_user': current_loggedin_user, 'programs': get_program, 'Student_Semester': get_semester,
-               'app_type': application_type}
+               'app_type': application_type, 'Set_Logo': set_logo, 'user_info':current_loggedin_user}
     return render(request, 'core/update_record.html', context)
 
 def DeleteRecordView(request, pk):
-    context = {}
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
+    get_user = AppUser.objects.get(id=pk)
+
+    if request.method == 'POST':
+        if 'yes' in request.POST:
+            get_user.delete()
+            return redirect('core:ViewAttendenceSearch')
+        else:
+            return redirect('core:ViewAttendenceSearch')
+    context = {'user_data':get_user, 'Set_Logo': set_logo, 'user_info':request.user}
     return render(request, 'core/delete_record.html', context)
 
 def calculate_hours_per_month(request):

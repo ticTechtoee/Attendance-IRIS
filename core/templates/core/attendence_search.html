@@ -46,7 +46,7 @@
                             <td>{{information.username}}</td>
                             <td>{{information.first_name}}</td>
                             <td>{{information.email}}</td>
-                            <td><a href="{% url 'core:ViewUpdateRecord' information.id  %}">Update</a> or <a href="{% url 'core:ViewUpdateRecord' information.id  %}">Delete</a></td>
+                            <td><a href="{% url 'core:ViewUpdateRecord' information.id  %}">Update</a> or <a href="{% url 'core:ViewDeleteRecord' information.id  %}">Delete</a></td>
 
                         </tr>
                         {% endfor %}
