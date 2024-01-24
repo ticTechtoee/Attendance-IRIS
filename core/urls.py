@@ -12,6 +12,8 @@ urlpatterns = [
     path('model_training/', views.TrainOnDataView, name="ViewTrainData"),
     path('detect_person/', views.DetectPersonView, name="ViewDetectPerson"),
     path('search_attendence/', views.AttendenceSearchView, name="ViewAttendenceSearch"),
+    path('update_record/<int:pk>/', views.UpdateRecordView, name="ViewUpdateRecord"),
+    path('delete_record/<int:pk>/', views.DeleteRecordView, name="ViewDeleteRecord"),
     path('person_attendence_record/<str:pk>/', views.AttendenceRecordView, name="ViewAttendenceRecord"),
 
     path('stop_user/', views.ViewStopMessage, name="StopMessageView"),

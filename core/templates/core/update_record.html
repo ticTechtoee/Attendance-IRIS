@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+{% load static %}
+
+<html>
+
+<head>
+    <title>Update Record</title>
+    <link href="{% static 'CSS/student_reg.css' %}" rel="stylesheet" type="text/css">
+    <link rel='icon' href="{% static '/Images/face-attendance-icon.png' %}">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        {% include "core/sidebar.html" %}
+        <div class="full_reg_form">
+            <div class="reg_form">
+                {% if error_messages %}
+    <ul class="error-messages">
+                {% for message in error_messages %}
+            <li class="error-message">{{ message }}</li>
+                {% endfor %}
+                </ul>
+                {% endif %}
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <table style="width: 100%;">
+                        <caption>Update Record</caption>
+                        <tr>
+                            <th>Unique ID</th>
+                            <td><input type="text" class="input" name="Unique_ID"
+                                    placeholder="Unique ID for Each Person" value="{{Record.custom_unique_id}}" disabled />
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <th>Username</th>
+                            <td><input type="text" class="input" name="username" maxlength="30" title="Enter username"
+                                    placeholder="Enter username" value="{{Record.username}}" required /></td>
+                        </tr>
+                        <tr>
+                            <th>First Name</th>
+                            <td><input type="text" class="input" name="fname" maxlength="30" title="Enter Name"
+                                    placeholder="Enter First Name" value="{{Record.first_name}}" required /></td>
+                        </tr>
+                        <tr>
+                            <th>Last Name</th>
+                            <td><input type="text" class="input" name="lname" maxlength="30" title="Enter Name"
+                                    placeholder="Enter Last Name" value="{{Record.last_name}}" required /></td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td><input type="email" class="input" name="email" maxlength="30" title="Enter Email"
+                                    placeholder="Enter Valid Email" value="{{Record.email}}" required /></td>
+                        </tr>
+                        <tr>
+                            <th>Department</th>
+                            <td>
+                                <select name="department" id="department" class="input form-control" placeholder="Department" required>
+                                    <option value="" disabled>Select Department</option>
+                                    {% for department in dept_names %}
+                                        <option value="{{ department.id }}" {% if Record.department_id == department.id %}selected{% endif %}>
+                                            {{ department.department_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Role</th>
+                            <td>
+                                <select name="role" id="role" class="input form-control" placeholder="Role" required>
+                                    <option value="" disabled>Select Role</option>
+                                    {% if loggedin_user.is_superuser %}
+                                        <option value="superuser" {% if Record.is_superuser %}selected{% endif %}>Admin</option>
+                                        <option value="teacher" {% if Record.is_teacher %}selected{% endif %}>Teacher</option>
+                                    {% elif loggedin_user.is_teacher %}
+                                        <option value="student" {% if not Record.is_teacher %}selected{% endif %}>Other</option>
+                                    {% endif %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% if app_type.type_app == "OTHER" %}
+                        {% else %}
+                        <tr>
+                            <th>Program</th>
+                            <td>
+                                <select name="program" id="program" class="input form-control" placeholder="Program" required>
+                                    <option value="" disabled>Select Program</option>
+                                    {% for program in programs %}
+                                        <option value="{{ program.id }}" {% if Record.program_id == program.id %}selected{% endif %}>
+                                            {{ program.program_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>Semester</th>
+                            <td>
+                                <select name="semester" id="semester" class="input form-control" placeholder="Semester">
+                                    <option value="" disabled>Select Semester</option>
+                                    {% for semester in Student_Semester %}
+                                        <option value="{{ semester.id }}" {% if Record.semester_id == semester.id %}selected{% endif %}>
+                                            {{ semester.semester_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <td colspan="2">
+                                <input class="reg_btn" type="submit" />
+                                <input class="reg_btn" type="reset" value="Reset" />
+                            </td>
+                        </tr>
+                    </table>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -23,7 +23,7 @@ from django.db import transaction
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import Font
-from AccountApp.models import AppUser, Attendance
+from AccountApp.models import AppUser, Attendance, Program, Semester, Department
 from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -370,6 +370,77 @@ def AttendenceRecordView(request, pk):
     context = {'Attendance_Record': attendance_records, 'User': get_user}
     return render(request, 'core/person_record.html', context)
 
+def UpdateRecordView(request, pk):
+    person_record = get_object_or_404(AppUser, id=pk)
+    get_department = Department.objects.all()
+    get_program = Program.objects.all()
+    get_semester = Semester.objects.all()
+    current_loggedin_user = request.user
+    user_role = 'superuser' if person_record.is_superuser else 'teacher' if person_record.is_teacher else 'other'
+    application_type = ApplicationType.objects.first()
+
+    if request.method == 'POST':
+        Unique_ID = request.POST.get('Unique_ID')
+        username = request.POST.get('username')
+        fname = request.POST.get('fname')
+        lname = request.POST.get('lname')
+        email = request.POST.get('email')
+        department_id = request.POST.get('department')  # Get department ID from the form
+
+        # Validate that department_id is a valid integer
+        try:
+            department_id = int(department_id)
+        except ValueError:
+            # Handle the case where department_id is not a valid integer
+            department_id = None
+
+        role = request.POST.get('role')
+
+        if application_type.type_app == 'EDU':
+            program_id = request.POST.get('program')  # Get program ID from the form
+            semester_id = request.POST.get('semester')  # Get semester ID from the form
+
+            # Validate that program_id and semester_id are valid integers
+            try:
+                program_id = int(program_id)
+                semester_id = int(semester_id)
+            except ValueError:
+                # Handle the case where program_id or semester_id is not a valid integer
+                program_id = None
+                semester_id = None
+        else:
+            program_id = None
+            semester_id = None
+
+        # Get Department, Program, and Semester instances or set to None if IDs are not valid
+        department_instance = get_object_or_404(Department, id=department_id) if department_id else None
+        program_instance = get_object_or_404(Program, id=program_id) if program_id else None
+        semester_instance = get_object_or_404(Semester, id=semester_id) if semester_id else None
+
+        # Update the AppUser instance
+        update_user = AppUser.objects.get(id=pk)
+        update_user.username = username
+        update_user.first_name = fname
+        update_user.last_name = lname
+        update_user.email = email
+        update_user.department = department_instance
+        update_user.role = role
+
+        if application_type.type_app == 'EDU':
+            update_user.program = program_instance
+            update_user.semester = semester_instance
+
+        update_user.save()
+        return redirect('core:ViewAttendenceSearch')
+
+    context = {'Record': person_record, 'dept_names': get_department, 'user_role': user_role,
+               'loggedin_user': current_loggedin_user, 'programs': get_program, 'Student_Semester': get_semester,
+               'app_type': application_type}
+    return render(request, 'core/update_record.html', context)
+
+def DeleteRecordView(request, pk):
+    context = {}
+    return render(request, 'core/delete_record.html', context)
 
 def calculate_hours_per_month(request):
     get_user = request.user
