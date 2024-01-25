@@ -311,13 +311,30 @@ def AttendenceSearchView(request):
         set_logo = ApplicationName.objects.latest('id')
     except ApplicationName.DoesNotExist:
         set_logo = None
+
     get_deptt_name = Department.objects.all()
+    get_program_name = Program.objects.all()
+    get_semester_name = Semester.objects.all()
+
     users_in_department = AppUser.objects.filter(is_superuser=False)
-    # Retrieve search parameter from the URL
-    select_deptt_name = request.GET.get('search_field')
+
+    # Retrieve search parameters from the URL
+    select_deptt_name = request.GET.get('dept_name')
+    select_program_name = request.GET.get('program_name')
+    select_semester_name = request.GET.get('semester_name')
+
     if select_deptt_name:
         get_deptt_object = Department.objects.get(id=select_deptt_name)
-        users_in_department = AppUser.objects.filter(department=get_deptt_object)
+        users_in_department = users_in_department.filter(department=get_deptt_object)
+
+    if select_program_name:
+        get_program_object = Program.objects.get(id=select_program_name)
+        users_in_department = users_in_department.filter(program=get_program_object)
+
+    if select_semester_name:
+        get_semester_object = Semester.objects.get(id=select_semester_name)
+        users_in_department = users_in_department.filter(semester=get_semester_object)
+
     # Add pagination
     paginator = Paginator(users_in_department, 10)  # Show 10 users per page
     page = request.GET.get('page')
@@ -327,7 +344,11 @@ def AttendenceSearchView(request):
         users_in_department = paginator.page(1)
     except EmptyPage:
         users_in_department = paginator.page(paginator.num_pages)
-    context = {'Department_Names': get_deptt_name, 'Users_Info': users_in_department, 'user_info':get_user, 'Set_Logo':set_logo}
+
+    context = {'Department_Names': get_deptt_name, 'Program_Names': get_program_name,
+               'Semester_Names': get_semester_name, 'Users_Info': users_in_department,
+               'user_info': get_user, 'Set_Logo': set_logo}
+
     return render(request, 'core/attendence_search.html', context)
 
 @login_required(login_url="AccountApp:custom_login")
