@@ -5,12 +5,12 @@
   list-style: none;
   text-decoration: none;
   }
-  
+
   body {
       font-family: "Poppins", sans-serif;
       overflow: hidden;
       background-color: rgba(246,249,250,.95);
-    
+
   }
 
 
@@ -21,34 +21,34 @@
       padding: 30px 0px;
       position: fixed;
   }
-  
+
   .wrapper .sidebar img{
       text-align: center;
       margin-bottom: 30px;
       margin-left: 15px;
       width: 130px;
   }
-  
+
   .wrapper .sidebar ul li{
       padding: 20px;
       border-bottom: 1px solid #bdb8d7;
       border-bottom: 1px solid rgba(0,0,0,0.05);
       border-top: 1px solid rgba(255,255,255,0.05);
-  }    
-  
+  }
+
   .wrapper .sidebar ul li a{
       color: #fff;
       display: block;
   }
-  
+
   .wrapper .sidebar ul li a .fas{
       width: 25px;
   }
-  
+
   .wrapper .sidebar ul li:hover{
      background-color: #32d99f;
   }
-      
+
   .wrapper .sidebar ul li:hover a{
       color: #fff;
   }
@@ -57,7 +57,7 @@
       margin-right: 40px;
   }
 
- 
+
   .full_reg_form {
       background-color: rgba(256, 256, 256, .70);
       border-radius: 10px;
@@ -68,7 +68,7 @@
       transform: translate(-50%, -50%);
       position: absolute;
       display: flex;
-      width: 40%;
+      width: auto;
       justify-content: center;
       align-items: center;
       text-align: center;
@@ -90,11 +90,11 @@
   .input-div:before {
       right: 50%;
   }
-  
+
   .input-div:after {
       left: 50%;
   }
-  
+
   .input-div.focus:before,
   .input-div.focus:after {
       width: 50%;

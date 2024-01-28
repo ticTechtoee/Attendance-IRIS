@@ -64,11 +64,18 @@ def check_attendance(view_func):
 
 def SetProjectNameView(request):
     try:
-        set_name =  ApplicationName.objects.latest('id')
+        set_name = ApplicationName.objects.latest('id')
     except ApplicationName.DoesNotExist:
         set_name = "No Name"
+
+    # If the user is already logged in, redirect to a different page
+    if request.user.is_authenticated:
+        return redirect('core:index')
+
     context = {'Name_of_Project': set_name}
     return render(request, 'core/welcome.html', context)
+
+
 @login_required(login_url="AccountApp:custom_login")
 def IndexPageView(request):
     get_user = request.user
@@ -519,12 +526,13 @@ def calculate_hours_per_month(request):
 
 
 def AdminAverageCalView(request):
-    get_user = request.user
+    get_user_info = request.user
+    get_user = None
     try:
         set_logo = ApplicationName.objects.latest('id')
     except ApplicationName.DoesNotExist:
         set_logo = None
-    context = {'user_info':get_user, 'Set_Logo':set_logo}
+    context = {'user_info':get_user_info, 'Set_Logo':set_logo}
     if request.method ==   'POST':
         get_user_custom_id = request.POST.get('user_custom_id')
         # Get the current month and year
@@ -553,7 +561,7 @@ def AdminAverageCalView(request):
         context = {
             'user_attendance': user_attendance,
             'total_hours': average_hour,
-            'user_info':get_user, 'Set_Logo':set_logo
+            'user_info':get_user_info, 'Set_Logo':set_logo
         }
 
     return render(request, 'core/admin_hours_calculation.html', context)
