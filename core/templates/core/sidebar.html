@@ -14,7 +14,11 @@
     <ul>
         <li><a href="{% url 'core:index' %}"><i class="fas fa-home"></i>Home</a></li>
         <li><a href="{% url 'AccountApp:ViewRegisterPerson' %}"><i class="fas fa-user"></i>Register Person</a></li>
+        {% if user_info.is_teacher == True %}
+        <li><a href="{% url 'core:ViewAttendenceSearch' %}"><i class="fas fa-search"></i>Search</a></li>
+        {% else %}
         <li><a href="{% url 'core:ViewAttendenceSearch' %}"><i class="fas fa-search"></i>Search & Update</a></li>
+        {% endif %}
         {% if user_info.is_teacher == True %}
         {% else %}
         <li><a href="{% url 'PayrollApp:ViewPayroll' %}"><i class="fas fa-coin"></i>Payroll</a></li>

@@ -64,7 +64,9 @@
                             <th scope="col">User Name</th>
                             <th scope="col">First Name</th>
                             <th scope="col">Email</th>
+                            {% if not user_info.is_teacher %}
                             <th scope="col">Action</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -75,8 +77,10 @@
                             <td>{{information.username}}</td>
                             <td>{{information.first_name}}</td>
                             <td>{{information.email}}</td>
-                            <td><a href="{% url 'core:ViewUpdateRecord' information.id  %}">Update</a> or <a href="{% url 'core:ViewDeleteRecord' information.id  %}">Delete</a></td>
+                            {% if not user_info.is_teacher %}
 
+                            <td><a href="{% url 'core:ViewUpdateRecord' information.id  %}">Update</a> or <a href="{% url 'core:ViewDeleteRecord' information.id  %}">Delete</a></td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                     </tbody>
