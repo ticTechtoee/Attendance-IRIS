@@ -3,20 +3,28 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from datetime import date, timedelta
 from AccountApp.models import AppUser, Attendance
+from core.models import ApplicationType, ApplicationName
 from decimal import Decimal
-import openpyxl
 from openpyxl.styles import Font
 
 def calculate_salary(record, hourly_rate):
     if record.is_present:
-        hours_worked = Decimal(8)
-        daily_salary = hourly_rate * hours_worked
+
+        hours_worked = record.calculate_hours_worked()
+        daily_salary = hourly_rate * hours_worked[0]
     else:
         daily_salary = Decimal(0)
 
     return daily_salary
 
 def PayrollView(request):
+    get_user = request.user
+    application_type = ApplicationType.objects.first()
+
+    try:
+        set_logo = ApplicationName.objects.latest('id')
+    except ApplicationName.DoesNotExist:
+        set_logo = None
     user = None
     payroll_data = None
     total_salary = None
@@ -56,7 +64,8 @@ def PayrollView(request):
         'user': user,
         'payroll_data': payroll_data,
         'total_salary': total_salary,
-        'Error_Message': error_message
+        'Error_Message': error_message,
+        'user_info': get_user, 'Set_Logo': set_logo, 'App_type':application_type
     }
 
     return render(request, 'PayrollApp/view.html', context)

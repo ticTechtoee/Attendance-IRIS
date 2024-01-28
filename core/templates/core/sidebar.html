@@ -17,6 +17,7 @@
         <li><a href="{% url 'core:ViewAttendenceSearch' %}"><i class="fas fa-search"></i>Search & Update</a></li>
         {% if user_info.is_teacher == True %}
         {% else %}
+        <li><a href="{% url 'PayrollApp:ViewPayroll' %}"><i class="fas fa-coin"></i>Payroll</a></li>
         <li><a href="{% url 'core:ViewTrainData' %}"><i class="fas fa-user"></i>Train Model</a></li>
         {% endif %}
         {% if user_info.is_superuser == True %}

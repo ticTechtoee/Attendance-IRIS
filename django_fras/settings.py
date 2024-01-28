@@ -29,8 +29,6 @@ INSTALLED_APPS = [
     'AccountApp.apps.AccountappConfig',
     'core',
     'PayrollApp.apps.PayrollappConfig',
-    #'users',
-    #'django_summernote',
 
 ]
 
@@ -69,20 +67,6 @@ WSGI_APPLICATION = 'django_fras.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-"""DATABASES = {
-    'default': {
-    'ENGINE': 'django.db.backends.mysql',
-    'NAME': 'fypdb',
-    'HOST': 'localhost',
-    'PORT': '3306',
-    'USER': 'root',
-    'PASSWORD': '',
-    'OPTIONS': {
-        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
-    },
-}
-}
-"""
 
 DATABASES = {
     'default': {
@@ -139,11 +123,3 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
