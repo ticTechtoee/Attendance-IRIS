@@ -19,35 +19,37 @@
             <form action="" method="get" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-row">
-                    <div class="col-md-4 mb-3">
-
+                    <div class="col-md-12 mb-3">
                         <select name="dept_name" class="form-control" id="dept_name">
-                            <option value="" disabled selected>Department</option>
+                            <option selected>Department</option>
                             {% for names in Department_Names %}
-                                <option value="{{ names.id }}" {% if names.id == request.GET.dept_name %}selected{% endif %}>{{ names.department_name }}</option>
+                            <option value="{{ names.id }}" {% if names.id == request.GET.dept_name %}selected{% endif %}>{{ names.department_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
 
-                    <div class="col-md-4 mb-3">
+                    {% if App_type.type_app == 'EDU' %}
+                    <div class="col-md-6 mb-3">
 
                         <select name="program_name" class="form-control" id="program_name">
                             <option value="" disabled selected>Program</option>
                             {% for names in Program_Names %}
-                                <option value="{{ names.id }}" {% if names.id == request.GET.program_name %}selected{% endif %}>{{ names.program_name }}</option>
+                            <option value="{{ names.id }}" {% if names.id == request.GET.program_name %}selected{% endif %}>{{ names.program_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
 
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
 
                         <select name="semester_name" class="form-control" id="semester_name">
                             <option value="" disabled selected>Semester</option>
                             {% for names in Semester_Names %}
-                                <option value="{{ names.id }}" {% if names.id == request.GET.semester_name %}selected{% endif %}>{{ names.semester_name }}</option>
+                            <option value="{{ names.id }}" {% if names.id == request.GET.semester_name %}selected{% endif %}>{{ names.semester_name }}</option>
                             {% endfor %}
                         </select>
                     </div>
+                    {% else %}
+                    {% endif %}
                 </div>
 
                 <button type="submit" class="btn btn-primary mb-2">Search</button>

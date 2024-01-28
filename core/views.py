@@ -307,6 +307,8 @@ def AttendanceFailedView(request):
 @login_required(login_url="AccountApp:custom_login")
 def AttendenceSearchView(request):
     get_user = request.user
+    application_type = ApplicationType.objects.first()
+
     try:
         set_logo = ApplicationName.objects.latest('id')
     except ApplicationName.DoesNotExist:
@@ -347,7 +349,7 @@ def AttendenceSearchView(request):
 
     context = {'Department_Names': get_deptt_name, 'Program_Names': get_program_name,
                'Semester_Names': get_semester_name, 'Users_Info': users_in_department,
-               'user_info': get_user, 'Set_Logo': set_logo}
+               'user_info': get_user, 'Set_Logo': set_logo, 'App_type':application_type}
 
     return render(request, 'core/attendence_search.html', context)
 

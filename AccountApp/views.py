@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from core.models import ApplicationName,ApplicationType,Department, Semester, Program
 from django.contrib.auth.decorators import user_passes_test, login_required
 import os
+from django.contrib.auth.password_validation import validate_password, ValidationError
 
 from django.db import IntegrityError
 
@@ -15,6 +16,7 @@ def is_admin(user):
     return user.is_authenticated and user.is_superuser
 
 # @user_passes_test(is_admin, login_url="AccountApp:custom_login")
+
 def RegisterPersonView(request):
     current_user = request.user
     get_user = request.user
@@ -26,16 +28,13 @@ def RegisterPersonView(request):
     get_dept_name = Department.objects.all()
     get_student_program = Program.objects.all()
     get_student_semester = Semester.objects.all()
+
     try:
-        # Assuming there's only one record in the ApplicationType model
         get_application_type = ApplicationType.objects.get()
     except ApplicationType.DoesNotExist:
-        # Handle the case where no record is found
         get_application_type = None
 
-    # Retrieve the role of the logged-in user from the session
-
-    error_messages = []  # Initialize error_messages list
+    error_messages = []
 
     if request.method == 'POST':
         u_id = request.POST.get('Unique_ID')
@@ -51,16 +50,18 @@ def RegisterPersonView(request):
         try:
             # Ensure passwords match
             if password != confirm_password:
-                # Handle the case where passwords do not match
                 error_messages.append('Passwords do not match')
+
+            # Validate the password
+            validate_password(password)
 
             # Hash the password
             hashed_password = make_password(password)
 
             # Get the department
             get_deptt = Department.objects.get(id=deptt)
+
             if get_application_type.type_app == "OTHER":
-                # Create the user with the appropriate role
                 user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
                                email=email, department=get_deptt, password=hashed_password)
             elif get_application_type.type_app == "EDU":
@@ -80,18 +81,17 @@ def RegisterPersonView(request):
             user.save()
 
             if user:
-                # Create a folder in the media directory using the unique ID, first name, and last name
                 folder_name = f"{u_id}_{first_name}_{last_name}"
                 media_folder_path = os.path.join("media/dataset/", folder_name)
 
-                # Check if the folder already exists, and create it if not
                 if not os.path.exists(media_folder_path):
                     os.makedirs(media_folder_path)
 
             return redirect('core:ViewCaptureImage')
 
+        except ValidationError as e:
+            error_messages.extend(e.messages)
         except IntegrityError:
-            # Handle the case where a user with the same email already exists
             error_messages.append('User with this email already exists')
 
     if current_user.is_superuser:
@@ -103,8 +103,10 @@ def RegisterPersonView(request):
 
     context = {'dept_names': get_dept_name, 'app_type': get_application_type,
                'Student_Program': get_student_program, 'Student_Semester': get_student_semester,
-               'user_role': user_role, 'error_messages': error_messages, 'user_info':get_user, 'Set_Logo':set_logo}
+               'user_role': user_role, 'error_messages': error_messages, 'user_info': get_user, 'Set_Logo': set_logo}
+
     return render(request, "core/student.html", context)
+
 
 
 def user_login(request):

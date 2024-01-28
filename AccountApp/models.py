@@ -8,14 +8,14 @@ class AppUser(AbstractUser):
     department = models.ForeignKey(Department, null=True, blank=True, on_delete=models.DO_NOTHING)
     program = models.ForeignKey(Program, null=True, blank=True, on_delete=models.DO_NOTHING)
     semester = models.ForeignKey(Semester, null=True, blank=True, on_delete=models.DO_NOTHING)
-    application_type = models.ForeignKey(ApplicationType, null=True, blank=True, on_delete=models.DO_NOTHING)
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_teacher = models.BooleanField(default=False)
     email = models.EmailField(unique=True)
 
     def save(self, *args, **kwargs):
         # Check if the user has an application type selected
-        if self.application_type and self.application_type.type_app == 'OTHER':
+        application_type = ApplicationType.objects.first()
+        if application_type and application_type.type_app == 'OTHER':
             # If the application type is 'OTHER', clear program and semester fields
             self.program = None
             self.semester = None
