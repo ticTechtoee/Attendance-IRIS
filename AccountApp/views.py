@@ -51,6 +51,7 @@ def RegisterPersonView(request):
             # Ensure passwords match
             if password != confirm_password:
                 error_messages.append('Passwords do not match')
+                raise ValidationError('Passwords do not match')  # Raise an exception to stop further execution
 
             # Validate the password
             validate_password(password)
@@ -63,15 +64,15 @@ def RegisterPersonView(request):
 
             if get_application_type.type_app == "OTHER":
                 user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
-                               email=email, department=get_deptt, password=hashed_password)
+                            email=email, department=get_deptt, password=hashed_password)
             elif get_application_type.type_app == "EDU":
                 program_id = request.POST.get('program')
                 program_instance = Program.objects.get(id=program_id)
                 semester_id = request.POST.get('semester')
                 semester_instance = Semester.objects.get(id=semester_id)
                 user = AppUser(custom_unique_id=u_id, username=user_name, first_name=first_name, last_name=last_name,
-                               email=email, department=get_deptt, password=hashed_password,
-                               program=program_instance, semester=semester_instance)
+                            email=email, department=get_deptt, password=hashed_password,
+                            program=program_instance, semester=semester_instance)
 
             if user_role == 'teacher':
                 user.is_teacher = True
