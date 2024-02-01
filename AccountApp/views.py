@@ -5,9 +5,10 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from core.models import ApplicationName,ApplicationType,Department, Semester, Program
 from django.contrib.auth.decorators import user_passes_test, login_required
+
 import os
 from django.contrib.auth.password_validation import validate_password, ValidationError
-
+from django.core.validators import validate_email
 from django.db import IntegrityError
 
 AppUser = get_user_model()
@@ -55,6 +56,9 @@ def RegisterPersonView(request):
 
             # Validate the password
             validate_password(password)
+
+            # Validate the email format
+            validate_email(email)
 
             # Hash the password
             hashed_password = make_password(password)
